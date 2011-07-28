@@ -147,7 +147,7 @@ class Navis_Layer_Builder {
             <div id="map-options">
                 <h2>Edit Map</h2>
                 <p>
-                    <label for="dimensions">Dimensions (px)</label>
+                    <label for="dimensions">Dimensions</label>
                 </p>
                 <p>Width: <input type="text" id="map-width" name="map-width" /></p>
                 <p>Height: <input type="text" id="map-height" name="map-height" /></p>
