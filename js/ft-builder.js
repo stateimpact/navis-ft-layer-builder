@@ -50,7 +50,7 @@ jQuery(function($) {
     
         defaults: {
             height: 400,
-            width: 600,
+            width: '100%',
             zoom: 6,
             center: "0,0"
         },
@@ -181,15 +181,10 @@ jQuery(function($) {
         initialize: function(options) {
             _.bindAll(this);
             layers.bind('add', this.addLayer);
-        
-            if (!layers.length) {
-                var layer = new FTLayer;
-                layers.add(layer);
-            }
-        
-            this.options = new MapOptions(options);
+            
+            this.options = new MapOptions(options);            
+            
             this.render();
-            this.mapEvents();
             return this;
         },
     
@@ -229,7 +224,7 @@ jQuery(function($) {
                 var value = this.options.get(field);
                 $('input#map-' + field).val(value);
             };
-        
+                        
             return this;
         },
     
@@ -243,7 +238,7 @@ jQuery(function($) {
                     layers: layers.complete()
                 }));
             $('body').append(script);
-            $('#js_code > textarea').html( script.html() );
+            $('#js_code textarea').html( script.html() );
         
             // map events need to be reset since we killed the old map
             this.mapEvents();
@@ -261,13 +256,6 @@ jQuery(function($) {
             return this;
         }
     
-    });
-
-    window.ft_builder = new AppView({
-        height: $('#map_canvas').height(),
-        width: $('#map_canvas').width(),
-        zoom: 7,
-        center: "41.095777,-77.579046"
     });
 
 });

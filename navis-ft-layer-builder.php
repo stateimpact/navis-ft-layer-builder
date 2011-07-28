@@ -34,7 +34,7 @@ class Navis_Layer_Builder {
         
         add_action( 'init', array( &$this, 'register_post_type' ) );
         add_action( 'add_meta_boxes', array( &$this, 'add_meta_boxes' ));
-        //add_action( 'save_post', array( &$this, 'save' ));
+        add_action( 'save_post', array( &$this, 'save' ));
         
         // scripts & styles
         add_action( 'admin_print_scripts-post.php', 
@@ -49,6 +49,12 @@ class Navis_Layer_Builder {
         add_action( 
             'admin_print_styles-post-new.php', 
             array( &$this, 'add_stylesheet' ) 
+        );
+        // add_action('admin_footer', array(&$this, 'add_footer_scripts'));
+        
+        $this->map_options_fields = array(
+            'map-height', 'map-width', 
+            'map-center', 'map-zoom'
         );
         
         // shortcode
@@ -82,19 +88,51 @@ class Navis_Layer_Builder {
             )
         ));
     }
+        
+    function save($post_id) {
+        if ( get_post_type($post_id) != 'fusiontablesmap') {
+            return;
+        }
+        
+        foreach( $this->map_options_fields as $field ) {
+            if (isset($_POST[$field]) ) {
+                update_post_meta($post_id, $field, $_POST[$field]);
+            }
+        }
+        
+        $layers = array();
+        if ( isset($_POST['layers']) ) {
+            foreach( $_POST['layers'] as $cid => $layer) {
+                if ( $layer['table_id'] ) $layers[] = $layer;
+            }
+            update_post_meta($post_id, 'layers', $layers);
+        }
+    }
     
     function add_meta_boxes() {
         add_meta_box( 'ft-builder', 'Layer Builder', 
         array( &$this, 'render_meta_box'),
         'fusiontablesmap', 'normal', 'high');
+        
+        add_meta_box( 'js_code', 'Map JavaScript',
+        array( &$this, 'js_meta_box' ),
+        'fusiontablesmap', 'normal', 'high');
     }
     
-    function render_meta_box($post) { ?>
+    function js_meta_box($post) { ?>
+        <textarea name="ft_map_js" style="width:100%;" rows="10"></textarea>
+        <?php
+    }
+    
+    function render_meta_box($post) { 
+        $height = get_post_meta($post->ID, 'map-height', true);
+        $width = get_post_meta($post->ID, 'map-width', true);
+        $center = get_post_meta($post->ID, 'map-center', true);
+        $zoom = get_post_meta($post->ID, 'map-zoom', true);
+        $layers = get_post_meta($post->ID, 'layers', true);
+        ?>
         <div id="map-wrapper">
             <div id="map_canvas"></div>
-            <div id="js_code">
-                <textarea style="width:100%;" rows="10"></textarea>
-            </div>
         </div>
         <div id="layers-wrap" class="alignleft">
             <div id="layers">
@@ -124,26 +162,23 @@ class Navis_Layer_Builder {
                 <input type="button" class="update-map" value="Update Map" />
             </div>
         </div>
-        
-        
-        
+
         <script type="x-javascript-template" id="layer-template">
         <div>
-            <label for="table_id-<%= cid %>">Table ID:</label>
-            <input type="text" class="table_id" name="table_id-<%= cid %>" value="<%= table_id %>" />
+            <label for="layers[<%= cid %>][table_id]">Table ID:</label>
+            <input type="text" class="table_id" name="layers[<%= cid %>][table_id]" value="<%= table_id %>" />
         </div>
         <div>
-            <label for="geometry_column-<%= cid %>">Location column</label>
-                <select class="geometry_column" name="geometry_column-<%= cid %>">
-                    <option> --- select --- </option>
+            <label for="layers[<%= cid %>][geometry_column]">Location column</label>
+                <select class="geometry_column" name="layers[<%= cid %>][geometry_column]">
+                    <option value=""> --- select --- </option>
                 </select>
         </div>
         <div>
-            <label for="where-<%= cid %>">Filter (WHERE)</label>
-            <input type="text" class="where" name="where-<%= cid %>" value="<%= filter %>" />
+            <label for="layers[<%= cid %>][where]">Filter (WHERE)</label>
+            <input type="text" class="where" name="layers[<%= cid %>][where]" value="<%= filter %>" />
         </div>
         <p><a href="#" class="delete">X</a></p>
-        <input type="hidden" name="layer-id" value="<%= cid %>" />
         </script>
 
         <script type="x-javacript-template" id="map-embed-template">
@@ -155,41 +190,38 @@ class Navis_Layer_Builder {
         window.ft_map = new google.maps.Map(document.getElementById('map_canvas'), {
             center: new google.maps.LatLng(<%= options.center %>),
             zoom: <%= options.zoom %>,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            scrollwheel: false
         });
 
         <% for (var i in layers) { %>
-            var newlayer = new google.maps.FusionTablesLayer({
+            new google.maps.FusionTablesLayer({
                 query: {
                     select: "<%= layers[i].get('geometry_column') %>",
                     from: "<%= layers[i].get('table_id') %>",
                     where: "<%= layers[i].get('filter') %>"
-                }
+                },
+                map: ft_map
             });
-
-            newlayer.setMap(ft_map);
         <% } %>
         </script>
-
-        <script id="map_embed">
-        var center = new google.maps.LatLng(41.09577724339462, -77.57904618437499);
-        window.ft_map = new google.maps.Map(document.getElementById('map_canvas'), {
-            center: center,
-            zoom: 7,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        });
-        /***
-        var layer = new google.maps.FusionTablesLayer({
-            query: {
-                select: 'geometry',
-                from: '1174691',
-                where: ''
-            }
-        });
-        layer.setMap(map);
-        ***/
-        </script>
         
+        <script>
+        // bootstrap
+        jQuery(function($) {
+            
+            window.ft_builder = new AppView({
+                <?php if ($height) echo "height: '$height',"; ?>
+                <?php if ($width) echo "width: '$width',"; ?>
+                <?php if ($zoom) echo "zoom: $zoom,"; ?>
+                <?php if ($center) echo "center: '$center',"; ?>
+            });
+            
+            layers.add(<?php echo json_encode($layers); ?>);
+            if (!layers.length) ft_builder.createLayer();
+            ft_builder.render_map();
+        });
+        </script>
         <?php
     }
     
