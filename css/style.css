@@ -1,0 +1,16 @@
+div#ft-builder div.inside {
+    overflow: hidden;
+}
+
+div#layers-wrap {
+    width: 45%;
+}
+
+div#options-wrap {
+    width: 45%;
+}
+
+div#map_canvas {
+    height: 400px;
+    margin-bottom: .5em;
+}
