@@ -119,9 +119,7 @@ class Navis_Layer_Builder {
     }
     
     function embed_shortcode($atts, $content, $code) {
-        if (is_single()) {
-            return '<div id="map_canvas"></div>';
-        }
+        return '<div id="map_canvas"></div>';
     }
     
     function add_meta_boxes() {
