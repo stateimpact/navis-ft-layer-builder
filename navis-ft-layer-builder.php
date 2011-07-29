@@ -236,7 +236,8 @@ class Navis_Layer_Builder {
             
             window.layers.add(<?php echo json_encode($layers); ?>);
             if (!window.layers.length) ft_builder.createLayer();
-            ft_builder.render_map();
+            
+            _.defer(ft_builder.render_map);
         });
         </script>
         <?php
