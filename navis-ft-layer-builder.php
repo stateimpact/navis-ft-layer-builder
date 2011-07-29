@@ -234,8 +234,8 @@ class Navis_Layer_Builder {
                 <?php if ($center) echo "center: '$center',"; ?>
             });
             
-            layers.add(<?php echo json_encode($layers); ?>);
-            if (!layers.length) ft_builder.createLayer();
+            window.layers.add(<?php echo json_encode($layers); ?>);
+            if (!window.layers.length) ft_builder.createLayer();
             ft_builder.render_map();
         });
         </script>
@@ -262,7 +262,8 @@ class Navis_Layer_Builder {
         wp_enqueue_script( 'backbone', $jslibs['backbone'],
             array('underscore', 'jquery'));
         wp_enqueue_script( 'ft-builder', $jslibs['builder'],
-            array('gmaps', 'jquery', 'underscore', 'backbone'));
+            array('gmaps', 'jquery', 'underscore', 'backbone'),
+            "0.1");
     }
     
     function register_scripts() {        

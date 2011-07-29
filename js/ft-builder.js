@@ -50,9 +50,9 @@ jQuery(function($) {
     
         defaults: {
             height: 400,
-            width: '100%',
-            zoom: 6,
-            center: "0,0"
+            width: 620,
+            zoom: 4, // the US
+            center: "38.754083,-97.734375"
         },
     
         fieldnames: ['height', 'width', 'center', 'zoom']
