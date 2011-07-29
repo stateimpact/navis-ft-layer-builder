@@ -43,6 +43,12 @@ class Navis_Layer_Builder {
         add_action( 'admin_print_scripts-post-new.php', 
             array( &$this, 'register_admin_scripts' )
         );
+        add_action( 'wp_print_scripts',
+            array( &$this, 'register_scripts' )
+        );
+        add_action( 'wp_head',
+            array( &$this, 'render_js')
+        );
         add_action( 
             'admin_print_styles-post.php', array( &$this, 'add_stylesheet' ) 
         );
@@ -54,11 +60,12 @@ class Navis_Layer_Builder {
         
         $this->map_options_fields = array(
             'map-height', 'map-width', 
-            'map-center', 'map-zoom'
+            'map-center', 'map-zoom',
+            'ft_map_js'
         );
         
         // shortcode
-        // add_shortcode( 'navis_fusion_map', array( &$this, 'embed_shortcode' ));
+        add_shortcode( 'navis_fusion_map', array( &$this, 'embed_shortcode' ));
         
     }
     
@@ -100,12 +107,20 @@ class Navis_Layer_Builder {
             }
         }
         
+        // deliberately compressing layers here to a numeric array
+        // layers without a table id won't be saved
         $layers = array();
         if ( isset($_POST['layers']) ) {
             foreach( $_POST['layers'] as $cid => $layer) {
                 if ( $layer['table_id'] ) $layers[] = $layer;
             }
             update_post_meta($post_id, 'layers', $layers);
+        }
+    }
+    
+    function embed_shortcode($atts, $content, $code) {
+        if (is_single()) {
+            return '<div id="map_canvas"></div>';
         }
     }
     
@@ -182,28 +197,30 @@ class Navis_Layer_Builder {
         </script>
 
         <script type="x-javacript-template" id="map-embed-template">
-        jQuery('#map_canvas').css({
-            height: "<%= options.height %>",
-            width: "<%= options.width %>"
-        });
-
-        window.ft_map = new google.maps.Map(document.getElementById('map_canvas'), {
-            center: new google.maps.LatLng(<%= options.center %>),
-            zoom: <%= options.zoom %>,
-            mapTypeId: google.maps.MapTypeId.ROADMAP,
-            scrollwheel: false
-        });
-
-        <% for (var i in layers) { %>
-            new google.maps.FusionTablesLayer({
-                query: {
-                    select: "<%= layers[i].get('geometry_column') %>",
-                    from: "<%= layers[i].get('table_id') %>",
-                    where: "<%= layers[i].get('filter') %>"
-                },
-                map: ft_map
+        jQuery(function($) {
+            $('#map_canvas').css({
+                height: "<%= options.height %>",
+                width: "<%= options.width %>"
             });
-        <% } %>
+
+            window.ft_map = new google.maps.Map(document.getElementById('map_canvas'), {
+                center: new google.maps.LatLng(<%= options.center %>),
+                zoom: <%= options.zoom %>,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                scrollwheel: false
+            });
+
+            <% for (var i in layers) { %>
+                new google.maps.FusionTablesLayer({
+                    query: {
+                        select: "<%= layers[i].get('geometry_column') %>",
+                        from: "<%= layers[i].get('table_id') %>",
+                        where: "<%= layers[i].get('filter') %>"
+                    },
+                    map: ft_map
+                });
+            <% } %>
+        });
         </script>
         
         <script>
@@ -246,6 +263,20 @@ class Navis_Layer_Builder {
             array('underscore', 'jquery'));
         wp_enqueue_script( 'ft-builder', $jslibs['builder'],
             array('gmaps', 'jquery', 'underscore', 'backbone'));
+    }
+    
+    function register_scripts() {        
+        wp_enqueue_script( 'gmaps',
+            'http://maps.googleapis.com/maps/api/js?sensor=false',
+            array('jquery'));    
+    }
+    
+    function render_js() {
+        global $post;
+        if (is_single()) {
+            $js = get_post_meta($post->ID, 'ft_map_js', true );
+            echo "<script>$js</script>\n";
+        }
     }
 }
 
