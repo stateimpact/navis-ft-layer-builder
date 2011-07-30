@@ -249,6 +249,8 @@ class Navis_Layer_Builder {
     }
     
     function register_admin_scripts() {
+        if (get_post_type() != 'fusiontablesmap') return;
+        
         $jslibs = array(
             'gmaps' => 'http://maps.googleapis.com/maps/api/js?sensor=false',
             'underscore' => plugins_url('js/underscore-min.js', __FILE__),
