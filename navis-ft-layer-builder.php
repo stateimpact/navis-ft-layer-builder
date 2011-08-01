@@ -269,6 +269,8 @@ class Navis_Layer_Builder {
     }
     
     function register_scripts() {        
+        if (get_post_type() != 'fusiontablesmap') return;
+        
         wp_enqueue_script( 'gmaps',
             'http://maps.googleapis.com/maps/api/js?sensor=false',
             array('jquery'));    
@@ -278,7 +280,7 @@ class Navis_Layer_Builder {
         global $post;
         if (is_single()) {
             $js = get_post_meta($post->ID, 'ft_map_js', true );
-            echo "<script>$js</script>\n";
+            if ($js) echo "<script>$js</script>\n";
         }
     }
 }
