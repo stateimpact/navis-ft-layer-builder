@@ -156,7 +156,7 @@ jQuery(function($) {
             function() {
                 var div = that.$('div.table_id');
                 div.addClass('error');
-                div.find('p.howto').text("Something went wrong. Check your Table ID and try again.");
+                div.find('p.howto').text("Something went wrong. Check your Table ID and make sure your map is public, then try again.");
             });
             return this;
         },
