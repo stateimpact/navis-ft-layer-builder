@@ -133,7 +133,7 @@ class Navis_Layer_Builder {
     }
     
     function js_meta_box($post) { ?>
-        <textarea name="ft_map_js" style="width:100%;" rows="10"></textarea>
+        <textarea name="ft_map_js" style="width:100%;" rows="10" readonly="readonly"></textarea>
         <?php
     }
     
