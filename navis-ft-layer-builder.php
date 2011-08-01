@@ -178,19 +178,26 @@ class Navis_Layer_Builder {
         </div>
 
         <script type="x-javascript-template" id="layer-template">
-        <div>
-            <label for="layers[<%= cid %>][table_id]">Table ID:</label>
-            <input type="text" class="table_id" name="layers[<%= cid %>][table_id]" value="<%= table_id %>" />
+        <div class="table_id">
+            <p>
+                <label for="layers[<%= cid %>][table_id]">Table ID:</label>
+                <input type="text" class="table_id" name="layers[<%= cid %>][table_id]" value="<%= table_id %>" />
+            </p>
+            <p class="howto">Paste in a Table ID from Google Fusion Tables</p>
         </div>
-        <div>
-            <label for="layers[<%= cid %>][geometry_column]">Location column</label>
-                <select class="geometry_column" name="layers[<%= cid %>][geometry_column]">
-                    <option value=""> --- select --- </option>
-                </select>
+        <div class="geometry_column">
+            <p>
+                <label for="layers[<%= cid %>][geometry_column]">Location column</label>
+                    <select class="geometry_column" name="layers[<%= cid %>][geometry_column]">
+                        <option value=""> --- select --- </option>
+                    </select>
+            </p>
         </div>
-        <div>
-            <label for="layers[<%= cid %>][where]">Filter (WHERE)</label>
-            <input type="text" class="where" name="layers[<%= cid %>][where]" value="<%= filter %>" />
+        <div class="where">
+            <p>
+                <label for="layers[<%= cid %>][where]">Filter (WHERE)</label>
+                <input type="text" class="where" name="layers[<%= cid %>][where]" value="<%= filter %>" />
+            </p>
         </div>
         <p><a href="#" class="delete">X</a></p>
         </script>
@@ -256,9 +263,11 @@ class Navis_Layer_Builder {
             'gmaps' => 'http://maps.googleapis.com/maps/api/js?sensor=false',
             'underscore' => plugins_url('js/underscore-min.js', __FILE__),
             'backbone' => plugins_url('js/backbone-min.js', __FILE__),
-            'builder' => plugins_url('js/ft-builder.js', __FILE__)
+            'builder' => plugins_url('js/ft-builder.js', __FILE__),
+            'jsonp' => plugins_url('js/jquery.jsonp-2.1.4.min.js', __FILE__),
         );
         
+        wp_enqueue_script( 'jsonp', $jslibs['jsonp']);
         wp_enqueue_script( 'gmaps', $jslibs['gmaps']);
         wp_enqueue_script( 'underscore', $jslibs['underscore']);
         wp_enqueue_script( 'backbone', $jslibs['backbone'],

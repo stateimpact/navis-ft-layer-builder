@@ -14,3 +14,8 @@ div#map_canvas {
     height: 400px;
     margin-bottom: .5em;
 }
+
+div.layer div {
+    width: 100%;
+    clear: both;
+}

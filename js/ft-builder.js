@@ -11,15 +11,16 @@ jQuery(function($) {
     function query(sql, callback, errback) {
         var base = "https://www.google.com/fusiontables/api/query?";
         var url = base + $.param({sql: sql});
-        $.ajax({
+        $.jsonp({
             url: url,
-            dataType: 'jsonp',
-            jsonp: 'jsonCallback',
+            //dataType: 'jsonp',
+            callback: 'jqjsp',
+            callbackParameter: 'jsonCallback',
             success: callback,
-            error: errback
+            error: errback,
         });
     };
-    
+    window.query = query;
 
     /***
     Models
@@ -145,8 +146,18 @@ jQuery(function($) {
                     table_id: table_id,
                     columns: columns
                 });
+                if (that.$('div.table_id').is('.error')) {
+                    that.$('div.table_id').removeClass('error').find('p.howto')
+                    .text('Paste in a Table ID from Google Fusion Tables');
+                };
                 if (_.isFunction(callback)) callback();
-            })
+            },
+            // errback
+            function() {
+                var div = that.$('div.table_id');
+                div.addClass('error');
+                div.find('p.howto').text("Something went wrong. Check your Table ID and try again.");
+            });
             return this;
         },
     
