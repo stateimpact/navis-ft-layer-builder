@@ -65,7 +65,7 @@ class Navis_Layer_Builder {
         );
         
         // shortcode
-        add_shortcode( 'navis_fusion_map', array( &$this, 'embed_shortcode' ));
+        add_shortcode( 'fusion_map', array( &$this, 'embed_shortcode' ));
         
     }
     
