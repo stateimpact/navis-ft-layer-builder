@@ -146,7 +146,6 @@ jQuery(function($) {
                     columns: columns
                 });
                 if (_.isFunction(callback)) callback();
-                select.focus();
             })
             return this;
         },
