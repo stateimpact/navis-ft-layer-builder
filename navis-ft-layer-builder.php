@@ -67,6 +67,29 @@ class Navis_Layer_Builder {
         // shortcode
         add_shortcode( 'fusion_map', array( &$this, 'embed_shortcode' ));
         
+        // tinymce plugin
+        add_action('init', array(&$this, 'register_tinymce_filters'));
+    }
+    
+    function register_tinymce_filters() {
+        add_filter('mce_external_plugins', 
+            array(&$this, 'add_tinymce_plugin')
+        );
+        add_filter('mce_buttons', 
+            array(&$this, 'register_button')
+        );
+    }
+    
+    function add_tinymce_plugin($plugin_array) {
+        $plugin_array['ft_builder'] = plugins_url(
+            'js/tinymce/editor-plugin.js', __FILE__);
+
+        return $plugin_array;
+    }
+    
+    function register_button($buttons) {
+        array_push($buttons, '|', 'ft_builder');
+        return $buttons;
     }
     
     function register_post_type() {
