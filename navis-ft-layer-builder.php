@@ -71,6 +71,15 @@ class Navis_Layer_Builder {
         add_action('init', array(&$this, 'register_tinymce_filters'));
     }
     
+    function get_defaults() {
+        return array(
+            'height' => 400,
+            'width' => 620,
+            'zoom' => 4, // the US
+            'center' => "38.754083,-97.734375"
+        );
+    }
+    
     function register_tinymce_filters() {
         add_filter('mce_external_plugins', 
             array(&$this, 'add_tinymce_plugin')
@@ -118,18 +127,28 @@ class Navis_Layer_Builder {
             )
         ));
     }
-        
+    
     function save($post_id) {
         if ( get_post_type($post_id) != 'fusiontablesmap') {
             return;
         }
         
-        foreach( $this->map_options_fields as $field ) {
-            if (isset($_POST[$field]) ) {
-                update_post_meta($post_id, $field, $_POST[$field]);
+        $changed = false;
+        $defaults = $this->get_defaults();
+        $options = get_post_meta($post_id, 'ft_map_options', true);
+        foreach($defaults as $key => $value) {
+            if (isset( $_POST['map'][$key] )) {
+                $options[$key] = $_POST['map'][$key];
+                $changed = true;
             }
         }
         
+        if ($changed) update_post_meta($post_id, 'ft_map_options', $options);
+        
+        if (isset($_POST['ft_map_js'])) {
+            update_post_meta($post_id, 'ft_map_js', $_POST['ft_map_js']);
+        }
+                
         // deliberately compressing layers here to a numeric array
         // layers without a table id won't be saved
         $layers = array();
@@ -139,6 +158,15 @@ class Navis_Layer_Builder {
             }
             update_post_meta($post_id, 'layers', $layers);
         }
+        
+        // wide assets
+        $wide_assets = get_post_meta($post_id, 'wide_assets', true);
+        if ($options['width'] > $defaults['width']) {
+            $wide_assets['ft_map'] = true;
+        } else {
+            $wide_assets['ft_map'] = false;
+        }
+        update_post_meta($post_id, 'wide_assets', $wide_assets);
     }
     
     function embed_shortcode($atts, $content, $code) {
@@ -161,10 +189,13 @@ class Navis_Layer_Builder {
     }
     
     function render_meta_box($post) { 
+        /***
         $height = get_post_meta($post->ID, 'map-height', true);
         $width = get_post_meta($post->ID, 'map-width', true);
         $center = get_post_meta($post->ID, 'map-center', true);
         $zoom = get_post_meta($post->ID, 'map-zoom', true);
+        ***/
+        $options = get_post_meta($post->ID, 'ft_map_options', true);
         $layers = get_post_meta($post->ID, 'layers', true);
         ?>
         <div id="map-wrapper">
@@ -187,15 +218,15 @@ class Navis_Layer_Builder {
                 <p>
                     <label for="dimensions">Dimensions</label>
                 </p>
-                <p>Width: <input type="text" id="map-width" name="map-width" /></p>
-                <p>Height: <input type="text" id="map-height" name="map-height" /></p>
+                <p>Width: <input type="text" id="map-width" name="map[width]" /></p>
+                <p>Height: <input type="text" id="map-height" name="map[height]" /></p>
                 <p>
-                    <label for="map-center">Map center</label>
-                    <input type="text" id="map-center" name="map-center">
+                    <label for="map[center]">Map center</label>
+                    <input type="text" id="map-center" name="map[center]">
                 </p>
                 <p>
-                    <label for="map-zoom">Zoom</label>
-                    <input type="text" id="map-zoom" name="map-zoom">
+                    <label for="map[zoom]">Zoom</label>
+                    <input type="text" id="map-zoom" name="map[zoom]">
                 </p>
             </div>
         </div>
@@ -256,12 +287,7 @@ class Navis_Layer_Builder {
         // bootstrap
         jQuery(function($) {
             
-            window.ft_builder = new AppView({
-                <?php if ($height) echo "height: '$height',"; ?>
-                <?php if ($width) echo "width: '$width',"; ?>
-                <?php if ($zoom) echo "zoom: $zoom,"; ?>
-                <?php if ($center) echo "center: '$center',"; ?>
-            });
+            window.ft_builder = new AppView(<?php echo json_encode($options); ?>);
             
             window.layers.add(<?php echo json_encode($layers); ?>);
             if (!window.layers.length) ft_builder.createLayer();
