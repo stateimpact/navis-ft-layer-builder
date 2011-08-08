@@ -182,8 +182,12 @@ jQuery(function($) {
         el: $('#ft-builder'),
     
         events: {
-            'click input.new-layer': 'createLayer',
-            'click input.update-map': 'render_map'
+            'click input.new-layer'   : 'createLayer',
+            'click input.update-map'  : 'render_map',
+            'change input#map-width'  : 'render_map',
+            'change input#map-height' : 'render_map',
+            'change input#map-zoom'   : 'render_map',
+            'change input#map-center' : 'render_map'
         },
     
         jsTemplate: _.template( $('#map-embed-template').html() ),
@@ -212,7 +216,7 @@ jQuery(function($) {
         
             return this;
         },
-    
+        
         // hook for when layers are added to a the layers collection
         // by user click or refresh
         addLayer: function(layer) {
@@ -220,21 +224,21 @@ jQuery(function($) {
             this.$('#layers').append(view.el);
             return this;
         },
-    
+        
         // method to create a layer when a user clicks the Add Layer button
         createLayer: function(e) {
             var layer = new FTLayer;
             layers.add(layer);
             return layer;
         },
-    
+        
         render: function() {
             for (var index in this.options.fieldnames) {
                 var field = this.options.fieldnames[index];
                 var value = this.options.get(field);
                 $('input#map-' + field).val(value);
             };
-                        
+            
             return this;
         },
     
