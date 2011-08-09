@@ -192,7 +192,7 @@ jQuery(function($) {
         events: {
             'click input.new-layer'   : 'createLayer',
             'click input.update-map'  : 'render_map',
-            'change input#map-width'  : 'render_map',
+            'change select#map-width'  : 'render_map',
             'change input#map-height' : 'render_map',
             'change input#map-zoom'   : 'render_map',
             'change input#map-center' : 'render_map'
@@ -221,7 +221,10 @@ jQuery(function($) {
             google.maps.event.addListener(map, 'center_changed', function() {
                 that.$('#map-center').val(map.getCenter().toUrlValue());
             });
-        
+            
+            that.$(map.getDiv()).resize(function() {
+                google.maps.event.trigger(map, 'resize');
+            });
             return this;
         },
         
@@ -244,7 +247,7 @@ jQuery(function($) {
             for (var index in this.options.fieldnames) {
                 var field = this.options.fieldnames[index];
                 var value = this.options.get(field);
-                $('input#map-' + field).val(value);
+                $('#map-' + field).val(value);
             };
             
             return this;
@@ -271,7 +274,7 @@ jQuery(function($) {
             var changes = {};
             for (var index in this.options.fieldnames) {
                 var field = this.options.fieldnames[index];
-                var value = $('input#map-' + field).val();
+                var value = $('#map-' + field).val();
                 changes[field] = value;
             };
             this.options.set(changes);

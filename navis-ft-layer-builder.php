@@ -278,7 +278,7 @@ class Navis_Layer_Builder {
         
         // wide assets
         $wide_assets = get_post_meta($post_id, 'wide_assets', true);
-        if ($options['width'] > $defaults['width']) {
+        if (intval( $options['width'] ) > $defaults['width']) {
             $wide_assets['ft_map'] = true;
         } else {
             $wide_assets['ft_map'] = false;
@@ -335,8 +335,13 @@ class Navis_Layer_Builder {
                 <p>
                     <label for="dimensions">Dimensions</label>
                 </p>
-                <p>Width: <input type="text" id="map-width" name="map[width]" /></p>
                 <p>Height: <input type="text" id="map-height" name="map[height]" /></p>
+                <p>Width: 
+                    <select id="map-width" name="map[width]">
+                        <option value="<?php echo get_option('ft_maps_default_width', 620); ?>">Normal</option>
+                        <option value="<?php echo get_option('ft_maps_full_width', 940); ?>">Wide</option>
+                    </select>
+                </p>
                 <p>
                     <label for="map[center]">Map center</label>
                     <input type="text" id="map-center" name="map[center]">
