@@ -73,10 +73,10 @@ class Navis_Layer_Builder {
     
     function get_defaults() {
         return array(
-            'height' => 400,
-            'width' => 620,
-            'zoom' => 4, // the US
-            'center' => "38.754083,-97.734375"
+            'height' => get_option('ft_map_default_height', 400),
+            'width' => get_option('ft_map_default_width', 620),
+            'zoom' => get_option('ft_map_default_zoom', 4), // the US
+            'center' => get_option('ft_map_default_center', "38.754083,-97.734375")
         );
     }
     
@@ -155,7 +155,7 @@ class Navis_Layer_Builder {
         if ( isset($_POST['layers']) ) {
             foreach( $_POST['layers'] as $cid => $layer) {
                 if ( $layer['table_id'] ) $layers[] = $layer;
-            }
+            }            
             update_post_meta($post_id, 'layers', $layers);
         }
         
@@ -232,6 +232,14 @@ class Navis_Layer_Builder {
         </div>
 
         <script type="x-javascript-template" id="layer-template">
+        <div class="table_label">
+            <p>
+                <label for="layers[<%= cid %>][label]">Label</label>
+                <input type="text" class="label" name="layers[<%= cid %>][label]" value="<%= label %>" />
+            </p>
+            <p class="howto">Optional: Give this layer a name</p>
+        </div>
+        
         <div class="table_id">
             <p>
                 <label for="layers[<%= cid %>][table_id]">Table ID:</label>

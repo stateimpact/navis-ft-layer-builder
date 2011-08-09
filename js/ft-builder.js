@@ -42,7 +42,8 @@ jQuery(function($) {
         defaults: {
             table_id: null,
             geometry_column: null,
-            filter: null
+            filter: null,
+            label: "",
         }
     })
 
@@ -91,6 +92,7 @@ jQuery(function($) {
             'change input.table_id'         : 'getColumns',
             'change select.geometry_column' : 'setGeoColumn',
             'change input.where'            : 'setFilter',
+            'change input.layer'            : 'setLabel',
             'click a.delete'                : 'remove'
         },
     
@@ -172,6 +174,12 @@ jQuery(function($) {
         setFilter: function(e) {
             var where = this.$('input.where').val();
             if (where) this.model.set({filter: where});
+            return this;
+        },
+        
+        setLabel: function(e) {
+            var label = this.$('input.label').val();
+            if (label) this.model.set({label: label});
             return this;
         }
     
