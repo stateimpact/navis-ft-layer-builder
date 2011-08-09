@@ -206,6 +206,11 @@ jQuery(function($) {
             
             this.options = new MapOptions(options);            
             
+            that = this;
+            $('form').submit(function(e) {
+                that.render_map();
+            })
+            
             this.render();
             return this;
         },
@@ -264,7 +269,7 @@ jQuery(function($) {
                 }));
             $('body').append(script);
             $('#js_code textarea').html( script.html() );
-        
+            
             // map events need to be reset since we killed the old map
             this.mapEvents();
             return this;
