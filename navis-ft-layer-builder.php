@@ -56,7 +56,16 @@ class Navis_Layer_Builder {
             'admin_print_styles-post-new.php', 
             array( &$this, 'add_stylesheet' ) 
         );
-        // add_action('admin_footer', array(&$this, 'add_footer_scripts'));
+                
+        // shortcode
+        add_shortcode( 'fusion_map', array( &$this, 'embed_shortcode' ));
+        
+        // tinymce plugin
+        add_action('init', array(&$this, 'register_tinymce_filters'));
+        
+        add_action( 'admin_menu', array(&$this, 'add_options_page'));
+    
+        add_action( 'admin_init', array(&$this, 'settings_init'));
         
         $this->map_options_fields = array(
             'map-height', 'map-width', 
@@ -64,21 +73,83 @@ class Navis_Layer_Builder {
             'ft_map_js'
         );
         
-        // shortcode
-        add_shortcode( 'fusion_map', array( &$this, 'embed_shortcode' ));
-        
-        // tinymce plugin
-        add_action('init', array(&$this, 'register_tinymce_filters'));
     }
     
     function get_defaults() {
         return array(
-            'height' => get_option('ft_map_default_height', 400),
-            'width' => get_option('ft_map_default_width', 620),
-            'zoom' => get_option('ft_map_default_zoom', 4), // the US
-            'center' => get_option('ft_map_default_center', "38.754083,-97.734375")
+            'height' => get_option('ft_maps_default_height', 400),
+            'width' => get_option('ft_maps_default_width', 620),
+            'zoom' => get_option('ft_maps_default_zoom', 4), // the US
+            'center' => get_option('ft_maps_default_center', "38.754083,-97.734375")
         );
     }
+    
+    function add_options_page() {
+        add_options_page('Fusion Tables Maps', 'Fusion Tables Maps', 'manage_options',
+                        'ft_maps', array(&$this, 'render_options_page'));
+    }
+    
+    function render_options_page() { ?>
+        <h2>Fusion Tables Map Options</h2>
+        <form action="options.php" method="post">
+            <?php settings_fields('ft_maps'); ?>
+            <?php do_settings_sections('ft_maps'); ?>
+            <input name="Submit" type="submit" value="<?php esc_attr_e('Save Changes'); ?>" />
+        </form>
+        <?php
+    }
+    
+    function settings_init() {
+        add_settings_section( 'ft_maps', '',
+            array(&$this, 'settings_section'), 'ft_maps');
+        
+        add_settings_field('ft_maps_default_height', 'Default Map Height (px)',
+            array(&$this, 'default_height_field'), 'ft_maps', 'ft_maps');
+        register_setting('ft_maps', 'ft_maps_default_height');
+        
+        add_settings_field('ft_maps_default_width', 'Default Map Width (px)',
+            array(&$this, 'default_width_field'), 'ft_maps', 'ft_maps');
+        register_setting('ft_maps', 'ft_maps_default_width');
+        
+        add_settings_field('ft_maps_full_width', 'Full-width Map Width (px)',
+            array(&$this, 'full_width_field'), 'ft_maps', 'ft_maps');
+        register_setting('ft_maps', 'ft_maps_full_width');
+        
+        add_settings_field('ft_maps_default_zoom', 'Default Zoom',
+            array(&$this, 'default_zoom_field'), 'ft_maps', 'ft_maps');
+        register_setting('ft_maps', 'ft_maps_default_zoom');
+        
+        add_settings_field('ft_maps_default_center', 'Default Map Center',
+            array(&$this, 'default_center_field'), 'ft_maps', 'ft_maps');
+        register_setting('ft_maps', 'ft_maps_default_center');
+    }
+    
+    function default_height_field() {
+        $option = intval(get_option( 'ft_maps_default_height', 400 ));
+        echo "<input type='text' value='$option' name='ft_maps_default_height' />";
+    }
+    
+    function default_width_field() {
+        $option = intval(get_option( 'ft_maps_default_width', 620 ));
+        echo "<input type='text' value='$option' name='ft_maps_default_width' />";
+    }
+    
+    function full_width_field() {
+        $option = intval(get_option( 'ft_maps_full_width', 620 ));
+        echo "<input type='text' value='$option' name='ft_maps_full_width' />";
+    }
+    
+    function default_zoom_field() {
+        $option = intval(get_option( 'ft_maps_default_zoom', 4 ));
+        echo "<input type='text' value='$option' name='ft_maps_default_zoom' />";
+    }
+    
+    function default_center_field() {
+        $option = get_option('ft_maps_default_center', "38.754083,-97.734375");
+        echo "<input type='text' value='$option' name='ft_maps_default_center' />";
+    }
+    
+    function settings_section() {}
     
     function register_tinymce_filters() {
         add_filter('mce_external_plugins', 
