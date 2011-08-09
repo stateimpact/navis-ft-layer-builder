@@ -91,11 +91,57 @@ class Navis_Layer_Builder {
     
     function render_options_page() { ?>
         <h2>Fusion Tables Map Options</h2>
+        <div id="demo_map" style="border: 1px solid #ddd;"></div>
         <form action="options.php" method="post">
             <?php settings_fields('ft_maps'); ?>
             <?php do_settings_sections('ft_maps'); ?>
-            <input name="Submit" type="submit" value="<?php esc_attr_e('Save Changes'); ?>" />
+            <p>
+                <input name="Submit" type="submit" class="button-primary" value="<?php esc_attr_e('Save Changes'); ?>" />
+                <input name="Reset" type="reset" class="button" />
+            </p>
         </form>
+        <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+        <script>
+        jQuery(function($) {
+            $('#demo_map').css({
+                height: <?php echo get_option('ft_maps_default_height', 400); ?>,
+                width: <?php echo get_option('ft_maps_default_width', 620); ?>
+            });
+            
+            var center = new google.maps.LatLng(<?php echo get_option('ft_maps_default_center', "38.754083,-97.734375"); ?>);
+            window.map = new google.maps.Map(document.getElementById('demo_map'), {
+                zoom: <?php echo get_option('ft_maps_default_zoom', 4); ?>,
+                center: center,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                scrollwheel: false
+            });
+            
+            google.maps.event.addListener(map, 'zoom_changed', function() {
+                $('input[name=ft_maps_default_zoom]').val(map.getZoom());
+            });
+        
+            google.maps.event.addListener(map, 'center_changed', function() {
+                $('input[name=ft_maps_default_center]').val(map.getCenter().toUrlValue());
+            });
+            
+            $(map.getDiv()).resize(function() {
+                google.maps.event.trigger(map, 'resize');
+            });
+            
+            $('input[name=ft_maps_default_height]').change(function(e){
+                var height = parseInt($(this).val());
+                if (height === NaN) return;
+                $(map.getDiv()).css({height: height});
+            });
+            
+            $('input[name=ft_maps_default_width]').change(function(e){
+                var width = parseInt($(this).val());
+                if (width === NaN) return;
+                $(map.getDiv()).css({width: width});
+            });
+            
+        })
+        </script>
         <?php
     }
     
