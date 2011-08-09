@@ -317,16 +317,14 @@ class Navis_Layer_Builder {
         ?>
         <div id="map-wrapper">
             <div id="map_canvas"></div>
-            <p>
-                <input type="button" class="update-map button-primary" value="Update Map" />
-            </p>
         </div>
         <div id="layers-wrap" class="alignleft">
             <div id="layers">
                 <h2>Add a layer</h2>
             </div>
             <p>
-                <input type="button" class="new-layer" value="Add another layer">
+                <input type="button" class="new-layer button" value="Add another layer">
+                <input type="button" class="update-map button-primary" value="Update Map" />
             </p>
         </div>
         <div id="options-wrap" class="alignright">
