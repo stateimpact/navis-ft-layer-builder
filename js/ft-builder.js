@@ -57,7 +57,18 @@ jQuery(function($) {
             center: "38.754083,-97.734375"
         },
     
-        fieldnames: ['height', 'width', 'center', 'zoom']
+        fieldnames: ['height', 'width', 'center', 'zoom'],
+        
+        validate: function(attrs) {
+            var intfields = ['height', 'width', 'zoom'];
+            for (var i in intfields) {
+                var field = intfields[i];
+                var value = attrs[field];
+                if (value && !_.isNumber(Number(value))) {
+                    return field;
+                };
+            };
+        }
     
     });
 
@@ -192,7 +203,7 @@ jQuery(function($) {
         events: {
             'click input.new-layer'   : 'createLayer',
             'click input.update-map'  : 'render_map',
-            'change select#map-width'  : 'render_map',
+            'change select#map-width' : 'render_map',
             'change input#map-height' : 'render_map',
             'change input#map-zoom'   : 'render_map',
             'change input#map-center' : 'render_map'
@@ -209,6 +220,17 @@ jQuery(function($) {
             that = this;
             $('form').submit(function(e) {
                 that.render_map();
+            });
+            
+            this.options.bind('error', function(model, error) {
+                // error is the name of the field failing to validate
+                that.$('#map-' + error).parent().addClass('error');
+            });
+            
+            _.each(this.options.fieldnames, function(field) {
+                that.options.bind('change:' + field, function(model, value) {
+                    that.$('#map-' + field).parent().removeClass('error');
+                });
             })
             
             this.render();
