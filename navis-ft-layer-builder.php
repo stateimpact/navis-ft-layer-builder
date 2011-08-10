@@ -407,7 +407,7 @@ class Navis_Layer_Builder {
         <div class="color">
             <p>
                 <label for="legend[styles][<%= cid %>][color]">Fill Color</label>
-                <input type="hidden" class="color" name="legend[styles][<%= cid %>][color]" value="<%= color %>" />
+                <input type="text" class="color" name="legend[styles][<%= cid %>][color]" value="<%= color %>" />
                 <div class="colorpicker"></div>
             </p>
         </script>
@@ -455,10 +455,14 @@ class Navis_Layer_Builder {
     }
     
     function add_stylesheet() {
-        $style_css = plugins_url( 'css/style.css', __FILE__ );
-        wp_enqueue_style( 
-            'navis-ft-layerbuilder-styles', $style_css, array(), '1.0'
+        $css = array(
+            'style' => plugins_url( 'css/style.css', __FILE__ ),
         );
+        wp_enqueue_style( 
+            'navis-ft-layerbuilder-styles', $css['style'], array(), '1.0'
+        );
+        
+        wp_enqueue_style('farbtastic');
     }
     
     function register_admin_scripts() {
@@ -470,15 +474,17 @@ class Navis_Layer_Builder {
             'backbone' => plugins_url('js/backbone-min.js', __FILE__),
             'builder' => plugins_url('js/ft-builder.js', __FILE__),
             'jsonp' => plugins_url('js/jquery.jsonp-2.1.4.min.js', __FILE__),
+            // 'colorpicker' => plugins_url('js/colorpicker.js', __FILE__),
         );
         
         wp_enqueue_script( 'jsonp', $jslibs['jsonp']);
         wp_enqueue_script( 'gmaps', $jslibs['gmaps']);
+        wp_enqueue_script( 'farbtastic');
         wp_enqueue_script( 'underscore', $jslibs['underscore']);
         wp_enqueue_script( 'backbone', $jslibs['backbone'],
             array('underscore', 'jquery'));
         wp_enqueue_script( 'ft-builder', $jslibs['builder'],
-            array('gmaps', 'jquery', 'underscore', 'backbone'),
+            array('gmaps', 'jquery', 'underscore', 'backbone', 'farbtastic'),
             "0.1");
     }
     

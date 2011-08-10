@@ -341,6 +341,13 @@ jQuery(function($) {
         initialize: function(options) {
             _.bindAll(this);
             this.render();
+            this.colorpicker();
+            return this;
+        },
+        
+        colorpicker: function() {
+            that = this;
+            this.$('.colorpicker').farbtastic(this.$('input.color'));
             return this;
         },
         
@@ -360,6 +367,7 @@ jQuery(function($) {
         },
         
         initialize: function(options) {
+            _.bindAll(this);
             
             if (_.isUndefined(this.collection)) {
                 this.collection = new StyleCollection
@@ -378,8 +386,8 @@ jQuery(function($) {
             var style = new LayerStyle;
             this.addStyle(style);
             return style;
-        }
-        
+        },
+                
     });
     
     window.legend = new Legend;
