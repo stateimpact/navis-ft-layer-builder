@@ -71,6 +71,22 @@ jQuery(function($) {
         }
     
     });
+    
+    // LayerStyle wraps the FusionTablesLayerOptions styles parameter and
+    // is used to build a legend. For now, it only applies to polygons.
+    var LayerStyle = Backbone.Model.extend({
+        
+        defaults: {
+            filter: null,
+            color: null,
+            label: null
+        },
+        
+        initialize: function(attributes, options) {
+            this.view = new StyleView({ model: this });
+            return this;
+        }
+    });
 
     /***
     Collections
@@ -90,6 +106,10 @@ jQuery(function($) {
     });
 
     window.layers = new LayerCollection;
+    
+    var StyleCollection = Backbone.Collection.extend({
+        model: LayerStyle
+    })
 
     /***
     Views
@@ -156,8 +176,9 @@ jQuery(function($) {
                     select.append(option);
                 }
                 that.model.set({
-                    table_id: table_id,
-                    columns: columns
+                    id       : table_id,
+                    table_id : table_id,
+                    columns  : columns
                 });
                 if (that.$('div.table_id').is('.error')) {
                     that.$('div.table_id').removeClass('error').find('p.howto')
@@ -309,5 +330,58 @@ jQuery(function($) {
         }
     
     });
-
+    
+    // UI for each LayerStyle
+    var StyleView = Backbone.View.extend({
+        
+        className: "layer-style",
+        
+        template: _.template( $('#style-template').html() ),
+        
+        initialize: function(options) {
+            _.bindAll(this);
+            this.render();
+            return this;
+        },
+        
+        render: function() {
+            var data = _.extend(this.model.toJSON(), {cid: this.model.cid});
+            $(this.el).html(this.template(data));
+            return this;
+        }
+    });
+    
+    var Legend = Backbone.View.extend({
+        
+        el: '#legend',
+        
+        events: {
+            'click input.add' : 'createStyle'
+        },
+        
+        initialize: function(options) {
+            
+            if (_.isUndefined(this.collection)) {
+                this.collection = new StyleCollection
+            };
+            return this;
+        },
+        
+        addStyle: function(style) {
+            if (_.isUndefined(style)) style = new LayerStyle;
+            this.collection.add(style);
+            this.$('#styles').append(style.view.el);
+            return this;
+        },
+        
+        createStyle: function(e) {
+            var style = new LayerStyle;
+            this.addStyle(style);
+            return style;
+        }
+        
+    });
+    
+    window.legend = new Legend;
+    
 });

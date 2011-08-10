@@ -350,6 +350,12 @@ class Navis_Layer_Builder {
                 </p>
                 <p class="howto">Map center and zoom will update automatically when the map changes</p>
             </div>
+            <div id="legend">
+                <h3>Legend</h3>
+                <p class="howto">Optional: Define map colors that will be represented in a legend</p>
+                <div id="styles"></div>
+                <p><input type="button" class="add button" value="Add Style" /></p>
+            </div>
         </div>
 
         <script type="x-javascript-template" id="layer-template">
@@ -379,13 +385,34 @@ class Navis_Layer_Builder {
         <div class="where">
             <p>
                 <label for="layers[<%= cid %>][where]">Filter (WHERE)</label>
-                <input type="text" class="where" name="layers[<%= cid %>][where]" value="<%= filter %>" />
+                <input type="text" class="where" name="layers[<%= cid %>][filter]" value="<%= filter %>" />
             </p>
         </div>
         <p><a href="#" class="delete">X</a></p>
         </script>
+        
+        <script type="x-javascript-template" id="style-template">
+        <div class="where">
+            <p>
+                <label for="legend[styles][<%= cid %>][filter]">Filter (WHERE)</label>
+                <input type="text" class="where" name="legend[styles][<%= cid %>][filter]" value="<%= filter %>"/>
+            </p>
+        </div>
+        <div class="label">
+            <p>
+                <label for="legend[styles][<%= cid %>][label]">Label</label>
+                <input type="text" class="label" name="legend[styles][<%= cid %>][label]" value="<%= label %>"/>
+            </p>
+        </div>
+        <div class="color">
+            <p>
+                <label for="legend[styles][<%= cid %>][color]">Fill Color</label>
+                <input type="hidden" class="color" name="legend[styles][<%= cid %>][color]" value="<%= color %>" />
+                <div class="colorpicker"></div>
+            </p>
+        </script>
 
-        <script type="x-javacript-template" id="map-embed-template">
+        <script type="x-javascript-template" id="map-embed-template">
         jQuery(function($) {
             $('#map_canvas').css({
                 height: "<%= options.height %>",
