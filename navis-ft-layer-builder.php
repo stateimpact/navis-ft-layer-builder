@@ -348,6 +348,7 @@ class Navis_Layer_Builder {
                     <label for="map[zoom]">Zoom</label>
                     <input type="text" id="map-zoom" name="map[zoom]">
                 </p>
+                <p class="howto">Map center and zoom will update automatically when the map changes</p>
             </div>
         </div>
 
