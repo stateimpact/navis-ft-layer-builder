@@ -270,10 +270,20 @@ class Navis_Layer_Builder {
         // layers without a table id won't be saved
         $layers = array();
         if ( isset($_POST['layers']) ) {
-            foreach( $_POST['layers'] as $cid => $layer) {
+            foreach( $_POST['layers'] as $cid => $layer ) {
                 if ( $layer['table_id'] ) $layers[] = $layer;
             }            
             update_post_meta($post_id, 'layers', $layers);
+        }
+        
+        // styles are part of map legends, compressed in the same way as layers
+        $styles = array();
+        if ( isset($_POST['legend']['styles']) ) {
+            error_log( print_r( $_POST['legend'], true ) );
+            foreach( $_POST['legend']['styles'] as $cid => $style ) {
+                if ($style['label'] && $style['color']) $styles[] = $style;
+            }
+            update_post_meta($post_id, 'legend_styles', $styles);
         }
         
         // wide assets
@@ -314,6 +324,7 @@ class Navis_Layer_Builder {
         ***/
         $options = get_post_meta($post->ID, 'ft_map_options', true);
         $layers = get_post_meta($post->ID, 'layers', true);
+        $styles = get_post_meta($post->ID, 'legend_styles', true);
         ?>
         <div id="map-wrapper">
             <div id="map_canvas"></div>
@@ -447,7 +458,7 @@ class Navis_Layer_Builder {
             
             window.layers.add(<?php echo json_encode($layers); ?>);
             if (!window.layers.length) ft_builder.createLayer();
-            
+            window.legend.collection.add(<?php echo json_encode($styles); ?>);
             _.defer(ft_builder.render_map);
         });
         </script>

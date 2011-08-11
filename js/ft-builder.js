@@ -81,11 +81,6 @@ jQuery(function($) {
             color: null,
             label: null
         },
-        
-        initialize: function(attributes, options) {
-            this.view = new StyleView({ model: this });
-            return this;
-        }
     });
 
     /***
@@ -223,11 +218,7 @@ jQuery(function($) {
     
         events: {
             'click input.new-layer'   : 'createLayer',
-            'click input.update-map'  : 'render_map',
-            'change select#map-width' : 'render_map',
-            'change input#map-height' : 'render_map',
-            'change input#map-zoom'   : 'render_map',
-            'change input#map-center' : 'render_map'
+            'click input.update-map'  : 'render_map'
         },
     
         jsTemplate: _.template( $('#map-embed-template').html() ),
@@ -236,9 +227,10 @@ jQuery(function($) {
             _.bindAll(this);
             layers.bind('add', this.addLayer);
             
-            this.options = new MapOptions(options);            
+            this.options = new MapOptions(options);
+            this.options.bind('change', this.render_map)
             
-            that = this;
+            var that = this;
             $('form').submit(function(e) {
                 that.render_map();
             });
@@ -315,6 +307,7 @@ jQuery(function($) {
             
             // map events need to be reset since we killed the old map
             this.mapEvents();
+            console.log('Map rendered');
             return this;
         },
     
@@ -340,23 +333,12 @@ jQuery(function($) {
         
         initialize: function(options) {
             _.bindAll(this);
+            this.model.view = this;
             this.render();
             this.colorpicker();
-            this.watchFields();
             return this;
         },
-        
-        watchFields: function() {
-            that = this;
-            var fields = _.keys(this.model.defaults);
-            _.each(fields, function(field) {
-                that.$('input.' + field).change(function(e) {
-                    change = {};
-                    change[field] = that.$('input.' + field).val();
-                });
-            });
-        },
-        
+                
         colorpicker: function() {
             that = this;
             this.$('input.color').ColorPicker({
@@ -398,19 +380,20 @@ jQuery(function($) {
             if (_.isUndefined(this.collection)) {
                 this.collection = new StyleCollection
             };
+            
+            this.collection.bind('add', this.addStyle);
             return this;
         },
         
         addStyle: function(style) {
-            if (_.isUndefined(style)) style = new LayerStyle;
-            this.collection.add(style);
-            this.$('#styles').append(style.view.el);
+            var view = new StyleView({ model: style });
+            this.$('#styles').append(view.el);
             return this;
         },
         
         createStyle: function(e) {
             var style = new LayerStyle;
-            this.addStyle(style);
+            this.collection.add(style);
             return style;
         },
                 
