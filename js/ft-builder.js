@@ -342,12 +342,38 @@ jQuery(function($) {
             _.bindAll(this);
             this.render();
             this.colorpicker();
+            this.watchFields();
             return this;
+        },
+        
+        watchFields: function() {
+            that = this;
+            var fields = _.keys(this.model.defaults);
+            _.each(fields, function(field) {
+                that.$('input.' + field).change(function(e) {
+                    change = {};
+                    change[field] = that.$('input.' + field).val();
+                });
+            });
         },
         
         colorpicker: function() {
             that = this;
-            this.$('.colorpicker').farbtastic(this.$('input.color'));
+            this.$('input.color').ColorPicker({
+                color: '#0000ff',
+            	onShow: function(colpkr) {
+            		$(colpkr).fadeIn(500);
+            		return false;
+            	},
+            	onHide: function(colpkr) {
+            		$(colpkr).fadeOut(500);
+            		return false;
+            	},
+            	onChange: function(hsb, hex, rgb) {
+            		that.$('input.color').css('backgroundColor', '#' + hex);
+            		that.$('input.color').val('#' + hex);
+            	}
+            });
             return this;
         },
         
