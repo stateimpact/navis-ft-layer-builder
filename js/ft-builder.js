@@ -307,7 +307,6 @@ jQuery(function($) {
             
             // map events need to be reset since we killed the old map
             this.mapEvents();
-            console.log('Map rendered');
             return this;
         },
     
