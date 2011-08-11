@@ -279,7 +279,6 @@ class Navis_Layer_Builder {
         // styles are part of map legends, compressed in the same way as layers
         $styles = array();
         if ( isset($_POST['legend']['styles']) ) {
-            error_log( print_r( $_POST['legend'], true ) );
             foreach( $_POST['legend']['styles'] as $cid => $style ) {
                 if ($style['label'] && $style['color']) $styles[] = $style;
             }
