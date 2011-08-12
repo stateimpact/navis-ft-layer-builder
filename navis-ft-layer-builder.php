@@ -424,6 +424,20 @@ class Navis_Layer_Builder {
             if (!window.layers.length) ft_builder.createLayer();
             
             _.defer(ft_builder.render_map);
+            
+            function setMinWidth() {
+                var width = Number($('select#map-width').val()) + 20;
+                if (width > $('#normal-sortables').width()) {
+                    $('#ft-builder').css({width: width});
+                    $('#wpwrap').css({width: width + 200});
+                } else {
+                    $('#ft-builder').css({width: ''});
+                    $('#wpwrap').css({width: ''});
+                }
+            };
+            
+            $('select#map-width').change(setMinWidth);
+            setMinWidth();
         });
         </script>
         <?php
