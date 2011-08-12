@@ -277,13 +277,15 @@ class Navis_Layer_Builder {
         }
         
         // wide assets
-        $wide_assets = get_post_meta($post_id, 'wide_assets', true);
-        if (intval( $options['width'] ) > $defaults['width']) {
-            $wide_assets['ft_map'] = true;
-        } else {
-            $wide_assets['ft_map'] = false;
+        if ($changed) {
+            $wide_assets = get_post_meta($post_id, 'wide_assets', true);
+            if (intval( $options['width'] ) > $defaults['width']) {
+                $wide_assets['ft_map'] = true;
+            } else {
+                $wide_assets['ft_map'] = false;
+            }
+            update_post_meta($post_id, 'wide_assets', $wide_assets);
         }
-        update_post_meta($post_id, 'wide_assets', $wide_assets);
     }
     
     function embed_shortcode($atts, $content, $code) {
@@ -327,7 +329,7 @@ class Navis_Layer_Builder {
                 <input type="button" class="update-map button-primary" value="Update Map" />
             </p>
         </div>
-        <div id="options-wrap" class="alignright">
+        <div id="options-wrap" class="alignleft">
             <div id="map-options">
                 <h2>Edit Map</h2>
                 <p>
