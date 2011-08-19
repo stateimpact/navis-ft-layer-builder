@@ -373,7 +373,7 @@ class Navis_Layer_Builder {
         <div class="geometry_column">
             <p>
                 <label for="layers[<%= cid %>][geometry_column]">Location column</label>
-                    <select class="geometry_column" name="layers[<%= cid %>][geometry_column]">
+                    <select disabled="disabled" class="geometry_column" name="layers[<%= cid %>][geometry_column]">
                         <option value=""> --- select --- </option>
                     </select>
             </p>

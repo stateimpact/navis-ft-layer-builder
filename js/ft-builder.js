@@ -189,6 +189,7 @@ jQuery(function($) {
                     that.$('div.table_id').removeClass('error').find('p.howto')
                     .text('Paste in a Table ID from Google Fusion Tables');
                 };
+                select.attr('disabled', false);
                 if (_.isFunction(callback)) callback();
             },
             // errback
