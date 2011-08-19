@@ -368,7 +368,7 @@ class Navis_Layer_Builder {
                 <label for="layers[<%= cid %>][table_id]">Table ID:</label>
                 <input type="text" class="table_id" name="layers[<%= cid %>][table_id]" value="<%= table_id %>" />
             </p>
-            <p class="howto">Paste in a Table ID from Google Fusion Tables</p>
+            <p class="howto">Paste in a <strong>Table ID</strong> or <strong>URL</strong> from Google Fusion Tables</p>
         </div>
         <div class="geometry_column">
             <p>
@@ -468,7 +468,7 @@ class Navis_Layer_Builder {
             array('underscore', 'jquery'));
         wp_enqueue_script( 'ft-builder', $jslibs['builder'],
             array('gmaps', 'jquery', 'underscore', 'backbone'),
-            "0.1");
+            "0.2");
     }
     
     function register_scripts() {        
