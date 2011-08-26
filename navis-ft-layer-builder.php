@@ -369,6 +369,10 @@ class Navis_Layer_Builder {
                         <option>Choose a layer</option>
                     </select>
                 </div>
+                <div>
+                    <label for="column-choices">Choose a column</label>
+                    <select id="column-choices"></select>
+                </div>
                 <div id="styles"></div>
                 <p><input type="button" class="add button" value="Add Style" /></p>
             </div>

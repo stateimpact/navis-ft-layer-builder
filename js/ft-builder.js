@@ -91,8 +91,9 @@ jQuery(function($) {
     var Legend = Backbone.Model.extend({
         
         defaults: {
-            layer_id: null,
-            buckets: 5
+            layer_id : null,
+            column   : null,
+            buckets  : 5
         },
         
         initialize: function(attributes) {
@@ -431,7 +432,7 @@ jQuery(function($) {
         el: '#legend',
         
         events: {
-            'click input.add'       : 'createStyle'
+            'click input.add' : 'createStyle'
         },
         
         initialize: function(options) {
