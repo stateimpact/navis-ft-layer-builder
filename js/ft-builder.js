@@ -21,7 +21,14 @@ jQuery(function($) {
         });
     };
     window.query = query;
-
+    
+    var COLORS = {
+        red:    [ "ECA496", "E27560", "D9482B", "A33622", "6D2516" ],
+        green:  [ "8BC0BF", "51A09E", "18817E", "14615F", "0D4140" ],
+        blue:   [ "A8D5EF", "7FBFE5", "52AADD", "3F7FA6", "295670" ],
+        yellow: [ "F7E39A", "F3D56A", "EFC635", "B39430", "776428" ],
+        orange: [ "F1C696", "EAAB61", "E28D2B", "AA6B28", "71481C" ]
+    }
     /***
     Models
     ***/
@@ -38,6 +45,14 @@ jQuery(function($) {
     ***/
 
     var FTLayer = Backbone.Model.extend({
+        
+        initialize: function(attributes) {
+            this.bind('change:table_id', function() {
+                this.set({id: this.get('table_id')});
+            }, this);
+            
+            this.option_view = new LayerOptionView({ model: this });
+        },
     
         defaults: {
             table_id: null,
@@ -45,7 +60,7 @@ jQuery(function($) {
             filter: null,
             label: "",
         }
-    })
+    });
 
     // a singleton to hold map options
     var MapOptions = Backbone.Model.extend({
@@ -70,6 +85,32 @@ jQuery(function($) {
             };
         }
     
+    });
+    
+    // a singleton to hold legend metadata and options
+    var Legend = Backbone.Model.extend({
+        
+        defaults: {
+            layer_id: null,
+            buckets: 5
+        },
+        
+        initialize: function(attributes) {
+            _.bindAll(this);
+            this.bind('change:layer_id', this.setLayer);
+            
+            if (window.layers.length === 1) {
+                this.set({ layer_id: window.layers.first().get('id')});
+            }
+        },
+        
+        setLayer: function() {
+            var layer_id = this.get('layer_id');
+            if (!layer_id) return;
+            
+            this.layer = window.layers.get(layer_id);
+            return this.layer;
+        }
     });
     
     // LayerStyle wraps the FusionTablesLayerOptions styles parameter and
@@ -158,8 +199,9 @@ jQuery(function($) {
             var table_id = this.$('input.table_id').val();
             if (!table_id) return;
         
-            var sql = "SELECT * FROM " + table_id + " LIMIT 1";
+            var sql = "SELECT * FROM " + table_id;
             query(sql, function(resp) {
+                that.model.table = resp.table;
                 var columns = resp.table.cols;
                 var select = that.$('select.geometry_column');
                 select.empty();
@@ -210,6 +252,25 @@ jQuery(function($) {
             return this;
         }
     
+    });
+    
+    // a simple view to keep layer options up to date
+    var LayerOptionView = Backbone.View.extend({
+        
+        tagName: 'option',
+        
+        initialize: function(options) {
+            _.bindAll(this);
+            this.model.bind('change', this.render)
+        },
+        
+        render: function() {
+            var label = this.model.get('label');
+            if (!label) label = this.model.get('table_id');
+            return $(this.el)
+                .attr('value', this.model.get('table_id'))
+                .text(label);
+        }
     });
 
     window.AppView = Backbone.View.extend({
@@ -365,22 +426,32 @@ jQuery(function($) {
         }
     });
     
-    var Legend = Backbone.View.extend({
+    var LegendAdmin = Backbone.View.extend({
         
         el: '#legend',
         
         events: {
-            'click input.add' : 'createStyle'
+            'click input.add'       : 'createStyle'
         },
         
         initialize: function(options) {
             _.bindAll(this);
             
             if (_.isUndefined(this.collection)) {
-                this.collection = new StyleCollection
+                this.collection = new StyleCollection;
+            };
+            
+            if (_.isUndefined(this.model)) {
+                this.model = model = new Legend;
             };
             
             this.collection.bind('add', this.addStyle);
+            window.layers.bind('add', this.addLayerOption);
+            //window.layers.bind('remove', this.setLayerChoices);
+            
+            $('#layer-choices').change(function() {
+                model.set({ layer_id: $(this).val()});
+            });
             return this;
         },
         
@@ -395,9 +466,19 @@ jQuery(function($) {
             this.collection.add(style);
             return style;
         },
+        
+        addLayerOption: function(layer) {
+            var select = $('#layer-choices');
+            var option = layer.option_view;
+            select.append(option.render());
+        },
+        
+        removeLayerOption: function(layer) {
+            layer.option_view.remove();
+        }
                 
     });
     
-    window.legend = new Legend;
+    window.legend = new LegendAdmin;
     
 });

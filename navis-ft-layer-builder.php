@@ -363,6 +363,12 @@ class Navis_Layer_Builder {
             <div id="legend">
                 <h3>Legend</h3>
                 <p class="howto">Optional: Define map colors that will be represented in a legend</p>
+                <div>
+                    <label for="layer-choices">Choose a layer</label>
+                    <select id="layer-choices" name="legend[layer_id]">
+                        <option>Choose a layer</option>
+                    </select>
+                </div>
                 <div id="styles"></div>
                 <p><input type="button" class="add button" value="Add Style" /></p>
             </div>
