@@ -286,13 +286,15 @@ class Navis_Layer_Builder {
         }
         
         // wide assets
-        $wide_assets = get_post_meta($post_id, 'wide_assets', true);
-        if (intval( $options['width'] ) > $defaults['width']) {
-            $wide_assets['ft_map'] = true;
-        } else {
-            $wide_assets['ft_map'] = false;
+        if ($changed) {
+            $wide_assets = get_post_meta($post_id, 'wide_assets', true);
+            if (intval( $options['width'] ) > $defaults['width']) {
+                $wide_assets['ft_map'] = true;
+            } else {
+                $wide_assets['ft_map'] = false;
+            }
+            update_post_meta($post_id, 'wide_assets', $wide_assets);
         }
-        update_post_meta($post_id, 'wide_assets', $wide_assets);
     }
     
     function embed_shortcode($atts, $content, $code) {
@@ -337,7 +339,7 @@ class Navis_Layer_Builder {
                 <input type="button" class="update-map button-primary" value="Update Map" />
             </p>
         </div>
-        <div id="options-wrap" class="alignright">
+        <div id="options-wrap" class="alignleft">
             <div id="map-options">
                 <h2>Edit Map</h2>
                 <p>
@@ -392,12 +394,12 @@ class Navis_Layer_Builder {
                 <label for="layers[<%= cid %>][table_id]">Table ID:</label>
                 <input type="text" class="table_id" name="layers[<%= cid %>][table_id]" value="<%= table_id %>" />
             </p>
-            <p class="howto">Paste in a Table ID from Google Fusion Tables</p>
+            <p class="howto">Paste in a <strong>Table ID</strong> or <strong>URL</strong> from Google Fusion Tables</p>
         </div>
         <div class="geometry_column">
             <p>
                 <label for="layers[<%= cid %>][geometry_column]">Location column</label>
-                    <select class="geometry_column" name="layers[<%= cid %>][geometry_column]">
+                    <select disabled="disabled" class="geometry_column" name="layers[<%= cid %>][geometry_column]">
                         <option value=""> --- select --- </option>
                     </select>
             </p>
@@ -469,6 +471,20 @@ class Navis_Layer_Builder {
             if (!window.layers.length) ft_builder.createLayer();
             window.legend.collection.add(<?php echo json_encode($styles); ?>);
             _.defer(ft_builder.render_map);
+            
+            function setMinWidth() {
+                var width = Number($('select#map-width').val()) + 20;
+                if (width > $('#normal-sortables').width()) {
+                    $('#ft-builder').css({width: width});
+                    $('#wpwrap').css({width: width + 200});
+                } else {
+                    $('#ft-builder').css({width: ''});
+                    $('#wpwrap').css({width: ''});
+                }
+            };
+            
+            $('select#map-width').change(setMinWidth);
+            setMinWidth();
         });
         </script>
         <?php
@@ -506,7 +522,7 @@ class Navis_Layer_Builder {
             array('underscore', 'jquery'));
         wp_enqueue_script( 'ft-builder', $jslibs['builder'],
             array('gmaps', 'jquery', 'underscore', 'backbone', 'color_picker'),
-            "0.1");
+            "0.2");
     }
     
     function register_scripts() {        

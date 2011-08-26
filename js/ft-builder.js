@@ -194,12 +194,37 @@ jQuery(function($) {
             }
             return this;
         },
+        
+        tableIdError: function() {
+            var div = this.$('div.table_id');
+            div.addClass('error');
+            div.find('p.howto').text("Something went wrong. Check your Table ID and make sure your map is public, then try again.");
+            return;
+        },
+        
+        getColumnsFromUrl: function(url, callback) {
+            var query = url.split('?')[1];
+            if (!query) return this.tableIdError();
+            var params = query.split('&');
+            for (var i in params) {
+                var param = params[i].split('=');
+                if (param[0] === 'dsrcid') {
+                    this.$('input.table_id').val(param[1]);
+                    
+                    this.getColumns(callback);
+                    return this;
+                }
+            }
+        },
     
         getColumns: function(callback) {
             var that = this;
             var table_id = this.$('input.table_id').val();
             if (!table_id) return;
-        
+            if (table_id.match(/https?:\/\/www\.google\.com\/fusiontables\/DataSource/)) {
+                return this.getColumnsFromUrl(table_id, callback);
+            }
+            
             var sql = "SELECT * FROM " + table_id;
             query(sql, function(resp) {
                 that.model.table = resp.table;
@@ -222,14 +247,11 @@ jQuery(function($) {
                     that.$('div.table_id').removeClass('error').find('p.howto')
                     .text('Paste in a Table ID from Google Fusion Tables');
                 };
+                select.attr('disabled', false);
                 if (_.isFunction(callback)) callback();
             },
             // errback
-            function() {
-                var div = that.$('div.table_id');
-                div.addClass('error');
-                div.find('p.howto').text("Something went wrong. Check your Table ID and make sure your map is public, then try again.");
-            });
+            this.tableIdError);
             return this;
         },
     

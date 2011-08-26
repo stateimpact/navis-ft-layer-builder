@@ -25,3 +25,7 @@ p.error {
     background-color: #FFEBE8;
     padding: .5em;
 }
+
+div#js_code {
+    display: none;
+}
