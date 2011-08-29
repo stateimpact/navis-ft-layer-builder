@@ -71,6 +71,14 @@ jQuery(function($) {
         }
     
     });
+    
+    var LegendRow = Backbone.Model.extend({
+        
+        defaults: {
+            color: null,
+            label: null
+        }
+    })
 
     /***
     Collections
@@ -90,6 +98,16 @@ jQuery(function($) {
     });
 
     window.layers = new LayerCollection;
+    
+    var LegendRowCollection = Backbone.Collection.extend({
+        model: LegendRow,
+        
+        complete: function() {
+            return this.filter(function(row) {
+                return (row.has('label') && row.has('color'));
+            });
+        }
+    })
 
     /***
     Views
@@ -331,6 +349,20 @@ jQuery(function($) {
             return this;
         }
     
+    });
+    
+    var LegendRowInput = Backbone.View.extend({
+        className: 'legend-row',
+        
+        initialize: function(options) {
+            _.bindAll(this);
+            this.model.view = this;
+            return this;
+        }
+    })
+    
+    window.Legend = Backbone.View.extend({
+        
     });
 
 });

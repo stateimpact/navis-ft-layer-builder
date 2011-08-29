@@ -409,7 +409,16 @@ class Navis_Layer_Builder {
             <% } %>
         });
         </script>
-        
+        <script type="x-javascript-template" id="legend-row-template">
+        <p class="legend-label">
+            <label for="legendrow[<%= cid %>][label]">Label</label>
+            <input type="text" class="label" name="legendrow[<%= cid %>][label]" />
+        </p>
+        <p class="legend-color">
+            <label for="legendrow[<%= cid %>][color]">Color</label>
+            <input type="text" class="color" name="legendrow[<%= cid %>][color]" />
+        </p>
+        </script>
         <script>
         // bootstrap
         jQuery(function($) {
@@ -472,7 +481,7 @@ class Navis_Layer_Builder {
         
         wp_enqueue_script( 'gmaps',
             'http://maps.googleapis.com/maps/api/js?sensor=false',
-            array('jquery'));    
+            array('jquery')); 
     }
     
     function render_js() {
