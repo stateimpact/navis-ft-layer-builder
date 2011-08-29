@@ -237,7 +237,7 @@ class Navis_Layer_Builder {
                 'title', 'editor', 'excerpt', 'thumbnail',
                 'author', 'comments', 'revisions'
             ),
-            'taxonomies' => array('post_tag'),
+            'taxonomies' => apply_filters('fustiontablesmap_taxonomies', array('post_tag', 'category')),
             'has_archive' => true,
             'rewrite' => array(
                 'slug' => 'maps'
