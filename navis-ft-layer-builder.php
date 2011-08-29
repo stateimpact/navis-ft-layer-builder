@@ -42,6 +42,7 @@ class Navis_Layer_Builder {
         add_action( 'wp_print_scripts',
             array( &$this, 'register_scripts' )
         );
+        add_action('wp_print_styles', array(&$this, 'add_map_styles'));
         add_action( 'wp_head',
             array( &$this, 'render_js')
         );
@@ -416,19 +417,19 @@ class Navis_Layer_Builder {
         </script>
         
         <script type="x-javascript-template" id="style-template">
-        <div class="where">
+        <div class="layer-where">
             <p>
                 <label for="legend[styles][<%= cid %>][filter]">Filter (WHERE)</label>
                 <input type="text" class="where" name="legend[styles][<%= cid %>][filter]" value="<%= filter %>"/>
             </p>
         </div>
-        <div class="label">
+        <div class="layer-label">
             <p>
                 <label for="legend[styles][<%= cid %>][label]">Label</label>
                 <input type="text" class="label" name="legend[styles][<%= cid %>][label]" value="<%= label %>"/>
             </p>
         </div>
-        <div class="color">
+        <div class="layer-color">
             <p>
                 <label for="legend[styles][<%= cid %>][color]">Fill Color</label>
                 <select class="color" name="legend[styles][<%= cid %>][color]" value="<%= color %>">
@@ -439,6 +440,7 @@ class Navis_Layer_Builder {
 
         <script type="x-javascript-template" id="map-embed-template">
         jQuery(function($) {
+            
             $('#map_canvas').css({
                 height: "<%= options.height %>",
                 width: "<%= options.width %>"
@@ -457,9 +459,42 @@ class Navis_Layer_Builder {
                         select: "<%= layers[i].get('geometry_column') %>",
                         from: "<%= layers[i].get('table_id') %>",
                         where: "<%= layers[i].get('filter') %>"
-                    },
+                    }, <% if (layers[i].isStyled()) { %>
+                    styles: [{ <% for (var i in styles) { %>
+                        <% if (styles[i].get('filter')) { %>
+                        where: "<%= styles[i].get('filter') %>",
+                        <% } %>
+                        polygonOptions: {
+                          fillColor: "#<%= styles[i].get('color') %>"
+                        }
+                        <% } %>
+                    }],
+                    <% } %>
                     map: ft_map
                 });
+            <% } %>
+            <% if (styles.length) { %>
+                var row, color;
+                window.leg = leg = $('<div/>')
+                    .addClass('legend');
+                <% for (var i in styles) { %>
+                    color = $('<div/>')
+                        .addClass('color')
+                        .css({
+                            width: '20px',
+                            height: '20px',
+                            'background-color': "#<%= styles[i].get('color') %>"
+                        });
+                    row = $('<p/>')
+                        .addClass('row')
+                        .text("<%= styles[i].get('label') %>")
+                        .prepend(color)
+                    leg.append(row);
+                <% } %>
+                
+                leg = leg[0];
+                leg.index = 1;
+                ft_map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(leg);
             <% } %>
         });
         </script>
@@ -471,9 +506,11 @@ class Navis_Layer_Builder {
             window.ft_builder = new AppView(<?php echo json_encode($options); ?>);
             
             window.layers.add(<?php echo json_encode($layers); ?>);
-            if (!window.layers.length) ft_builder.createLayer();
+            if (!window.layers.length) {ft_builder.createLayer();}
+            
             window.legend.collection.add(<?php echo json_encode($styles); ?>);
             window.legend.model.set({ layer_id: "<?php echo $legend_layer; ?>"});
+            
             _.defer(ft_builder.render_map);
             
             function setMinWidth() {
@@ -493,6 +530,8 @@ class Navis_Layer_Builder {
         </script>
         <?php
     }
+    
+    function add_map_styles() {}
     
     function add_stylesheet() {
         $css = array(

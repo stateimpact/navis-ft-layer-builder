@@ -53,7 +53,16 @@ jQuery(function($) {
             
             this.option_view = new LayerOptionView({ model: this });
         },
-    
+        
+        isStyled: function() {
+            var legend = window.legend.model;
+            if (legend) {
+                return legend.get('layer_id') === this.id;
+            } else {
+                return false;
+            }
+        },
+        
         defaults: {
             table_id: null,
             geometry_column: null,
@@ -122,7 +131,7 @@ jQuery(function($) {
             filter: null,
             color: null,
             label: null
-        },
+        }
     });
 
     /***
@@ -145,7 +154,13 @@ jQuery(function($) {
     window.layers = new LayerCollection;
     
     var StyleCollection = Backbone.Collection.extend({
-        model: LayerStyle
+        model: LayerStyle,
+        
+        complete: function() {
+            return this.filter(function(style) {
+                return (style.has('color') && style.has('label'));
+            });
+        }
     })
 
     /***
@@ -384,10 +399,12 @@ jQuery(function($) {
                 .attr('id', '#map-embed')
                 .html( this.jsTemplate({
                     options: this.options.toJSON(),
-                    layers: layers.complete()
+                    layers: layers.complete(),
+                    styles: legend.collection.complete()
                 }));
+                            
             $('body').append(script);
-            $('#js_code textarea').html( script.html() );
+            $('#js_code textarea').html( $.trim(script.html()) );
             
             // map events need to be reset since we killed the old map
             this.mapEvents();
@@ -421,7 +438,23 @@ jQuery(function($) {
             this.model.view = this;
             this.model.bind('change', this.update);
             this.render();
+            this.watchFields();
             return this.update(this.model);
+        },
+        
+        watchFields: function() {
+            var style = this.model;
+            this.$('input.where').change(function() {
+                style.set({filter: $(this).val()});
+            });
+            
+            this.$('select.color').change(function() {
+                sytle.set({color: $(this.val())});
+            });
+            
+            this.$('input.label').change(function() {
+                style.set({label: $(this.val())});
+            })
         },
                 
         colorpicker: function() {
@@ -493,8 +526,6 @@ jQuery(function($) {
             });
             
             this.model.bind('change:layer_id', function(legend, layer_id, options) {
-                console.log('Changed layer_id to ' + layer_id);
-                console.log(layer_id);
                 $('#layer-choices').val(layer_id);
             });
             return this;
