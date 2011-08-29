@@ -26,13 +26,9 @@
 class Navis_Layer_Builder {
     
     function  __construct() {
-        // post type
-        // meta box
-        // save hook
-        // shortcode
-        // render
-        
-        add_action( 'init', array( &$this, 'register_post_type' ) );
+
+        // new post type is added late so taxonomies have time to register
+        add_action( 'init', array( &$this, 'register_post_type' ), 15 );
         add_action( 'add_meta_boxes', array( &$this, 'add_meta_boxes' ));
         add_action( 'save_post', array( &$this, 'save' ));
         
