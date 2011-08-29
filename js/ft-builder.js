@@ -22,7 +22,7 @@ jQuery(function($) {
     };
     window.query = query;
     
-    var COLORS = {
+    window.COLORS = {
         red:    [ "ECA496", "E27560", "D9482B", "A33622", "6D2516" ],
         green:  [ "8BC0BF", "51A09E", "18817E", "14615F", "0D4140" ],
         blue:   [ "A8D5EF", "7FBFE5", "52AADD", "3F7FA6", "295670" ],
@@ -416,35 +416,51 @@ jQuery(function($) {
         
         initialize: function(options) {
             _.bindAll(this);
+            that = this;
+            
             this.model.view = this;
+            this.model.bind('change', this.update);
             this.render();
-            this.colorpicker();
-            return this;
+            return this.update(this.model);
         },
                 
         colorpicker: function() {
-            that = this;
-            this.$('input.color').ColorPicker({
-                color: '#0000ff',
-            	onShow: function(colpkr) {
-            		$(colpkr).fadeIn(500);
-            		return false;
-            	},
-            	onHide: function(colpkr) {
-            		$(colpkr).fadeOut(500);
-            		return false;
-            	},
-            	onChange: function(hsb, hex, rgb) {
-            		that.$('input.color').css('backgroundColor', '#' + hex);
-            		that.$('input.color').val('#' + hex);
-            	}
+            var selector = this.$('select.color');
+            _.each(window.COLORS, function(choices, colorname, colors) {
+                // colorname is red, blue, green, etc
+                // colors is a list of hex codes from light to dark
+                var group = $('<optgroup/>')
+                            .addClass(colorname)
+                            .attr('label', colorname);
+                _.each(choices, function(color) {
+                    // color is a hex code
+                    var option = $('<option/>')
+                        .addClass(color)
+                        .attr('value', color)
+                        .text(color)
+                        .css({ 'background-color': '#' + color });
+                    group.append(option);
+                });
+                selector.append(group);
             });
+            if (this.model.color) {
+                selector.val(this.model.color);
+            }
             return this;
         },
         
         render: function() {
             var data = _.extend(this.model.toJSON(), {cid: this.model.cid});
             $(this.el).html(this.template(data));
+            this.colorpicker();
+            return this;
+        },
+        
+        update: function(style, options) {
+            var that = this;
+            _.each(style.attributes, function(value, key, style) {
+                that.$('.' + key).val(value);
+            });
             return this;
         }
     });
@@ -459,7 +475,7 @@ jQuery(function($) {
         
         initialize: function(options) {
             _.bindAll(this);
-            
+            var that = this;
             if (_.isUndefined(this.collection)) {
                 this.collection = new StyleCollection;
             };
@@ -474,6 +490,12 @@ jQuery(function($) {
             
             $('#layer-choices').change(function() {
                 model.set({ layer_id: $(this).val()});
+            });
+            
+            this.model.bind('change:layer_id', function(legend, layer_id, options) {
+                console.log('Changed layer_id to ' + layer_id);
+                console.log(layer_id);
+                $('#layer-choices').val(layer_id);
             });
             return this;
         },

@@ -274,10 +274,12 @@ class Navis_Layer_Builder {
         
         // styles are part of map legends, compressed in the same way as layers
         $styles = array();
-        if ( isset($_POST['legend']['styles']) ) {
+        if ( isset($_POST['legend']['styles']) && isset($_POST['legend']['layer_id']) ) {
             foreach( $_POST['legend']['styles'] as $cid => $style ) {
                 if ($style['label'] && $style['color']) $styles[] = $style;
             }
+            
+            update_post_meta($post_id, 'legend_layer', $_POST['legend']['layer_id']);
             update_post_meta($post_id, 'legend_styles', $styles);
         }
         
@@ -322,6 +324,7 @@ class Navis_Layer_Builder {
         $options = get_post_meta($post->ID, 'ft_map_options', true);
         $layers = get_post_meta($post->ID, 'layers', true);
         $styles = get_post_meta($post->ID, 'legend_styles', true);
+        $legend_layer = get_post_meta($post->ID, 'legend_layer', true);
         ?>
         <div id="map-wrapper">
             <div id="map_canvas"></div>
@@ -366,11 +369,14 @@ class Navis_Layer_Builder {
                     <select id="layer-choices" name="legend[layer_id]">
                         <option>Choose a layer</option>
                     </select>
+                    <p class="howto">All styles will be applied to this layer</p>
                 </div>
+                <!--
                 <div>
                     <label for="column-choices">Choose a column</label>
                     <select id="column-choices"></select>
                 </div>
+                -->
                 <div id="styles"></div>
                 <p><input type="button" class="add button" value="Add Style" /></p>
             </div>
@@ -425,8 +431,9 @@ class Navis_Layer_Builder {
         <div class="color">
             <p>
                 <label for="legend[styles][<%= cid %>][color]">Fill Color</label>
-                <input type="text" class="color" name="legend[styles][<%= cid %>][color]" value="<%= color %>" />
-                <div class="colorpicker"></div>
+                <select class="color" name="legend[styles][<%= cid %>][color]" value="<%= color %>">
+                    <option>Colors</option>
+                </select>
             </p>
         </script>
 
@@ -466,6 +473,7 @@ class Navis_Layer_Builder {
             window.layers.add(<?php echo json_encode($layers); ?>);
             if (!window.layers.length) ft_builder.createLayer();
             window.legend.collection.add(<?php echo json_encode($styles); ?>);
+            window.legend.model.set({ layer_id: "<?php echo $legend_layer; ?>"});
             _.defer(ft_builder.render_map);
             
             function setMinWidth() {
