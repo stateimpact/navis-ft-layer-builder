@@ -466,7 +466,7 @@ class Navis_Layer_Builder {
                         <% } %>
                         polygonOptions: {
                           fillColor: "#<%= styles[i].get('color') %>"
-                        }
+                        },
                         <% } %>
                     }],
                     <% } %>
