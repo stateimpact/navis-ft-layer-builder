@@ -531,18 +531,20 @@ class Navis_Layer_Builder {
         <?php
     }
     
-    function add_map_styles() {}
+    function add_map_styles() {
+        $css = plugins_url('css/ft_map.css', __FILE__);
+        wp_enqueue_style('ft-map-styles', $css, array(), '0.1');
+    }
     
     function add_stylesheet() {
         $css = array(
             'style' => plugins_url( 'css/style.css', __FILE__ ),
-            'color_picker' => plugins_url( 'css/colorpicker.css', __FILE__ ),
+            'ft_map' => plugins_url( 'css/ft_map.css', __FILE__ ),
         );
         wp_enqueue_style( 
             'navis-ft-layerbuilder-styles', $css['style'], array(), '1.0'
         );
-        
-        wp_enqueue_style('color_picker', $css['color_picker']);
+        wp_enqueue_style('ft-map-styles', $css['ft_map'], array(), '0.1');        
     }
     
     function register_admin_scripts() {

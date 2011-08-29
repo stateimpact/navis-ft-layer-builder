@@ -1,0 +1,12 @@
+div.legend {
+    background-color: #FFF;
+    padding: .5em;
+    margin-right: .5em;
+}
+
+div.legend div.color {
+    float: left;
+    width: 20px;
+    height: 20px;
+    margin-right: .25em;
+}
