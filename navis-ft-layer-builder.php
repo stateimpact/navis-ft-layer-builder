@@ -26,7 +26,7 @@
 class Navis_Layer_Builder {
     
     function  __construct() {
-        
+
         // new post type is added late so taxonomies have time to register
         add_action( 'init', array( &$this, 'register_post_type' ), 15 );
         add_action( 'add_meta_boxes', array( &$this, 'add_meta_boxes' ));
