@@ -328,7 +328,8 @@ jQuery(function($) {
                 .attr('id', '#map-embed')
                 .html( this.jsTemplate({
                     options: this.options.toJSON(),
-                    layers: layers.complete()
+                    layers: layers.complete(),
+                    rows: legend.collection.complete()
                 }));
             $('body').append(script);
             $('#js_code textarea').html( script.html() );

@@ -42,6 +42,9 @@ class Navis_Layer_Builder {
         add_action( 'wp_print_scripts',
             array( &$this, 'register_scripts' )
         );
+        
+        add_action('wp_print_styles', array(&$this, 'add_map_styles'));
+        
         add_action( 'wp_head',
             array( &$this, 'render_js')
         );
@@ -425,6 +428,23 @@ class Navis_Layer_Builder {
                     map: ft_map
                 });
             <% } %>
+            
+            <% if (rows.length) { %>
+                var legendbox = $('<div/>').addClass('legend');
+                <% for (var i in rows) { %>
+                    var color = $('<div/>')
+                        .addClass('color')
+                        .css({'background-color': "#<%= rows[i].get('color') %>"});
+                        
+                    var row = $('<p/>')
+                        .addClass('row')
+                        .text("<%= rows[i].get('label') %>")
+                        .append(color)
+                    
+                    legendbox.append(row);
+                <% } %>
+                ft_map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legendbox[0]);
+            <% } %>
         });
         </script>
         <script type="x-javascript-template" id="legend-row-template">
@@ -470,9 +490,11 @@ class Navis_Layer_Builder {
     
     function add_stylesheet() {
         $style_css = plugins_url( 'css/style.css', __FILE__ );
+        $legend_css = plugins_url('css/ft_map.css', __FILE__);
         wp_enqueue_style( 
             'navis-ft-layerbuilder-styles', $style_css, array(), '1.0'
         );
+        wp_enqueue_style('ft-map-styles', $legend_css, array(), '0.1');
     }
     
     function register_admin_scripts() {
@@ -494,6 +516,11 @@ class Navis_Layer_Builder {
         wp_enqueue_script( 'ft-builder', $jslibs['builder'],
             array('gmaps', 'jquery', 'underscore', 'backbone'),
             "0.2");
+    }
+    
+    function add_map_styles() {
+        $css = plugins_url('css/ft_map.css', __FILE__);
+        wp_enqueue_style('ft-map-styles', $css, array(), '0.1');
     }
     
     function register_scripts() {        
