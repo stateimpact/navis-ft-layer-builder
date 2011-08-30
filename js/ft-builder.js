@@ -363,7 +363,6 @@ jQuery(function($) {
         initialize: function(options) {
             _.bindAll(this);
             this.model.view = this;
-            this.watchFields();
             return this.render();
         },
         
@@ -372,20 +371,32 @@ jQuery(function($) {
                 cid: this.model.cid
             });
             $(this.el).html( this.template(data) );
+            this.watchFields();
+            if (this.model.get('color')) {
+                this.setColor(this.model, this.model.get('color'));
+            }
             return this;
         },
         
         
         watchFields: function() {
             var row = this.model;
-            for (var field in this.model.defaults) {
-                this.$('input.' + field).change(function(){
-                    changes = {};
-                    changes[field] = $(this).val();
-                    row.set(changes);
-                });
-            }
+            this.$('input.label').change(function() {
+                row.set({ label: $(this).val() });
+            });
+            
+            this.$('input.color').change(function() {
+                row.set({ color: $(this).val() });
+            });
+            
+            row.bind('change:color', this.setColor);
             return this;
+        },
+        
+        setColor: function(row, color, options) {
+            this.$('input.color').css({
+                'background-color': '#' + color
+            });
         }
         
     })
