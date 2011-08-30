@@ -1,8 +1,13 @@
+div#map_canvas {
+    margin-bottom: 1.5em;
+}
+
 div.legend {
     background-color: #FFF;
-    padding: .5em;
+    padding: 1em;
+    padding-bottom: 0;
     margin-right: 1em;
-    border: 1px solid #ddd;
+    border: 1px solid #999;
 }
 
 div.legend p {
@@ -10,9 +15,14 @@ div.legend p {
     line-height: .9em;
 }
 
+div.legend p:last {
+    margin-bottom: 11px;
+}
+
 div.legend div.color {
     float: left;
     width: 20px;
     height: 1em;
     margin-right: .5em;
+    border: 1px solid #ddd;
 }
