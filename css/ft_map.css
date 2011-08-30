@@ -24,3 +24,13 @@ div.legend div.color {
     border: 1px solid #ddd;
     vertical-align: text-top;
 }
+
+/* Admin overrides */
+#ft-builder div.legend {
+    padding-bottom: 1.5em;
+}
+
+#ft-builder div.legend h6 {
+    font-size: 12px;
+    margin: 0;
+}
