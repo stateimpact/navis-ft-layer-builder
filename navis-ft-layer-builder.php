@@ -424,7 +424,16 @@ class Navis_Layer_Builder {
                 center: new google.maps.LatLng(<%= options.center %>),
                 zoom: <%= options.zoom %>,
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
-                scrollwheel: false
+                scrollwheel: false,
+                styles: [
+                    {
+                      featureType: 'all',
+                      elementType: 'all',
+                      stylers: [
+                        { saturation: -50 }
+                      ]
+                    }
+                  ]
             });
 
             <% for (var i in layers) { %>
