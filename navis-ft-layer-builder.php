@@ -272,6 +272,17 @@ class Navis_Layer_Builder {
             update_post_meta($post_id, 'layers', $layers);
         }
         
+        // legend
+        $rows = array();
+        if ( isset($_POST['legendrow']) ) {
+            foreach( $_POST['legendrow'] as $cid => $row ) {
+                if ($row['label'] && $row['color']) {
+                    $rows[] = $row;
+                }
+            }
+            update_post_meta($post_id, 'legendrows', $rows);
+        }
+        
         // wide assets
         if ($changed) {
             $wide_assets = get_post_meta($post_id, 'wide_assets', true);
@@ -312,6 +323,7 @@ class Navis_Layer_Builder {
         ***/
         $options = get_post_meta($post->ID, 'ft_map_options', true);
         $layers = get_post_meta($post->ID, 'layers', true);
+        $rows = get_post_meta($post->ID, 'legendrows', true);
         ?>
         <div id="map-wrapper">
             <div id="map_canvas"></div>
@@ -347,6 +359,12 @@ class Navis_Layer_Builder {
                     <input type="text" id="map-zoom" name="map[zoom]">
                 </p>
                 <p class="howto">Map center and zoom will update automatically when the map changes</p>
+            </div>
+            <div id="legend">
+                <h3>Legend</h3>
+                <p class="howto">Optional: Define legend styles</p>
+                <div id="rows"></div>
+                <p><input type="button" class="add-row button" value="Add Row" /></p>
             </div>
         </div>
 
@@ -412,11 +430,12 @@ class Navis_Layer_Builder {
         <script type="x-javascript-template" id="legend-row-template">
         <p class="legend-label">
             <label for="legendrow[<%= cid %>][label]">Label</label>
-            <input type="text" class="label" name="legendrow[<%= cid %>][label]" />
+            <input type="text" class="label" name="legendrow[<%= cid %>][label]" value="<%= label %>" />
         </p>
         <p class="legend-color">
             <label for="legendrow[<%= cid %>][color]">Color</label>
-            <input type="text" class="color" name="legendrow[<%= cid %>][color]" />
+            <input type="text" class="color" name="legendrow[<%= cid %>][color]" value="<%= color %>" />
+            <input type="button" class="remove button" value="X" title="Delete" />
         </p>
         </script>
         <script>
@@ -427,6 +446,7 @@ class Navis_Layer_Builder {
             
             window.layers.add(<?php echo json_encode($layers); ?>);
             if (!window.layers.length) ft_builder.createLayer();
+            legend.collection.add(<?php echo json_encode($rows); ?>);
             
             _.defer(ft_builder.render_map);
             

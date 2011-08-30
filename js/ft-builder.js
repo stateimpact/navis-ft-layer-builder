@@ -353,16 +353,72 @@ jQuery(function($) {
     
     var LegendRowInput = Backbone.View.extend({
         className: 'legend-row',
+        template: _.template( $('#legend-row-template').html() ),
+        
+        events: {
+            'click input.remove' : 'remove'
+        },
         
         initialize: function(options) {
             _.bindAll(this);
             this.model.view = this;
+            this.watchFields();
+            return this.render();
+        },
+        
+        render: function() {
+            var data = _.extend(this.model.toJSON(), {
+                cid: this.model.cid
+            });
+            $(this.el).html( this.template(data) );
+            return this;
+        },
+        
+        
+        watchFields: function() {
+            var row = this.model;
+            for (var field in this.model.defaults) {
+                this.$('input.' + field).change(function(){
+                    changes = {};
+                    changes[field] = $(this).val();
+                    row.set(changes);
+                });
+            }
             return this;
         }
+        
     })
     
     window.Legend = Backbone.View.extend({
         
+        el: '#legend',
+        
+        events: {
+            'click input.add-row' : 'createRow'
+        },
+        
+        initialize: function(options) {
+            _.bindAll(this);
+            this.collection = new LegendRowCollection;
+            
+            this.collection.bind('add', this.addRow);
+            return this;
+        },
+        
+        addRow: function(row) {
+            var view = new LegendRowInput({ model: row });
+            this.$('#rows').append(view.el);
+            return this;
+        },
+        
+        createRow: function(e) {
+            var row = new LegendRow;
+            this.collection.add(row);
+            return row;
+        }
+        
     });
+    
+    window.legend = new Legend;
 
 });
