@@ -286,6 +286,10 @@ class Navis_Layer_Builder {
             update_post_meta($post_id, 'legendrows', $rows);
         }
         
+        if ( isset($_POST['legend_title']) ) {
+            update_post_meta($post_id, 'legend_title', $_POST['legend_title']);
+        }
+        
         // wide assets
         if ($changed) {
             $wide_assets = get_post_meta($post_id, 'wide_assets', true);
@@ -327,6 +331,7 @@ class Navis_Layer_Builder {
         $options = get_post_meta($post->ID, 'ft_map_options', true);
         $layers = get_post_meta($post->ID, 'layers', true);
         $rows = get_post_meta($post->ID, 'legendrows', true);
+        $legend_title = get_post_meta($post->ID, 'legend_title', true);
         ?>
         <div id="map-wrapper">
             <div id="map_canvas"></div>
@@ -366,6 +371,10 @@ class Navis_Layer_Builder {
             <div id="legend">
                 <h3>Legend</h3>
                 <p class="howto">Optional: Define legend styles</p>
+                <p class="legend-title">
+                    <label for="legend_title">Title</label>
+                    <input type="text" name="legend_title" id="legend_title" value="<?php echo $legend_title; ?>" />
+                </p>
                 <div id="rows"></div>
                 <p><input type="button" class="add-row button" value="Add Row" /></p>
             </div>
@@ -431,10 +440,14 @@ class Navis_Layer_Builder {
             
             <% if (rows.length) { %>
                 var legendbox = $('<div/>').addClass('legend');
+                <% if (options.legend_title) { %>
+                var title = $('<h6/>').text('<%= options.legend_title %>');
+                legendbox.append(title);
+                <% } %>
                 <% for (var i in rows) { %>
                     var color = $('<div/>')
                         .addClass('color')
-                        .css({'background-color': "#<%= rows[i].get('color') %>"});
+                        .css({'background-color': "<%= rows[i].get('color') %>"});
                         
                     var row = $('<p/>')
                         .addClass('row')

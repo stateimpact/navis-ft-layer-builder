@@ -54,7 +54,8 @@ jQuery(function($) {
             height: 400,
             width: 620,
             zoom: 4, // the US
-            center: "38.754083,-97.734375"
+            center: "38.754083,-97.734375",
+            legend_title: null
         },
     
         fieldnames: ['height', 'width', 'center', 'zoom'],
@@ -247,7 +248,8 @@ jQuery(function($) {
             'change select#map-width' : 'render_map',
             'change input#map-height' : 'render_map',
             'change input#map-zoom'   : 'render_map',
-            'change input#map-center' : 'render_map'
+            'change input#map-center' : 'render_map',
+            'change input#legend_title' : 'setLegendTitle'
         },
     
         jsTemplate: _.template( $('#map-embed-template').html() ),
@@ -347,6 +349,13 @@ jQuery(function($) {
                 changes[field] = value;
             };
             this.options.set(changes);
+            this.setLegendTitle();
+            return this;
+        },
+        
+        setLegendTitle: function(e) {
+            var title = $('#legend_title').val();
+            this.options.set({ legend_title: title });
             return this;
         }
     
@@ -395,7 +404,7 @@ jQuery(function($) {
         
         setColor: function(row, color, options) {
             this.$('input.color').css({
-                'background-color': '#' + color
+                'background-color': color
             });
         }
         
