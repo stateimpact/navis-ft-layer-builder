@@ -369,7 +369,7 @@ class Navis_Layer_Builder {
                 <p class="howto">Map center and zoom will update automatically when the map changes</p>
             </div>
             <div id="legend">
-                <h3>Legend</h3>
+                <h2>Legend</h2>
                 <p class="howto">Optional: Define legend styles</p>
                 <p class="legend-title">
                     <label for="legend_title">Title</label>
@@ -410,7 +410,7 @@ class Navis_Layer_Builder {
                 <input type="text" class="where" name="layers[<%= cid %>][where]" value="<%= filter %>" />
             </p>
         </div>
-        <p><a href="#" class="delete">X</a></p>
+        <p><a href="#" class="delete button">X</a></p>
         </script>
 
         <script type="x-javacript-template" id="map-embed-template">
