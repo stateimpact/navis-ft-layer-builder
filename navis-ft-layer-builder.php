@@ -88,7 +88,9 @@ class Navis_Layer_Builder {
                         'ft_maps', array(&$this, 'render_options_page'));
     }
     
-    function render_options_page() { ?>
+    function render_options_page() { 
+        $protocol = $_SERVER['HTTPS'] ? "https" : "http";
+        ?>
         <h2>Fusion Tables Map Options</h2>
         <div id="demo_map" style="border: 1px solid #ddd;"></div>
         <form action="options.php" method="post">
@@ -99,7 +101,7 @@ class Navis_Layer_Builder {
                 <input name="Reset" type="reset" class="button" />
             </p>
         </form>
-        <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+        <script src="<?php echo $protocol; ?>://maps.googleapis.com/maps/api/js?sensor=false"></script>
         <script>
         jQuery(function($) {
             $('#demo_map').css({
@@ -521,9 +523,10 @@ class Navis_Layer_Builder {
     
     function register_admin_scripts() {
         if (get_post_type() != 'fusiontablesmap') return;
-        
+        $protocol = $_SERVER['HTTPS'] ? "https" : "http";
+
         $jslibs = array(
-            'gmaps' => 'http://maps.googleapis.com/maps/api/js?sensor=false',
+            'gmaps' => "$protocol://maps.googleapis.com/maps/api/js?sensor=false",
             'underscore' => plugins_url('js/underscore-min.js', __FILE__),
             'backbone' => plugins_url('js/backbone-min.js', __FILE__),
             'builder' => plugins_url('js/ft-builder.js', __FILE__),
@@ -548,8 +551,9 @@ class Navis_Layer_Builder {
     function register_scripts() {        
         if (get_post_type() != 'fusiontablesmap') return;
         
+        $protocol = $_SERVER['HTTPS'] ? "https" : "http";
         wp_enqueue_script( 'gmaps',
-            'http://maps.googleapis.com/maps/api/js?sensor=false',
+            "$protocol://maps.googleapis.com/maps/api/js?sensor=false",
             array('jquery')); 
     }
     
