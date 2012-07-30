@@ -1,0 +1,20 @@
+Navis Fusion Table Layer Builder
+=============
+
+This is a tool for building multi-layered Google Fusion Tables maps within WordPress. It relies on Backbone.js, Google Maps and the Fusion Tables API.
+
+A warning: Most of this code hasn't been touched in months. Updates should include upgrading Backbone and Underscore and ensuring that the Google Maps code complies with the latest version of the API. Google has been known to change things, especially with Fusion Tables, without warning.
+
+Plugin architecture
+----------------
+
+The plugin is built around a single class, `Navis_Layer_Builder`. It creates a custom post type called `fusiontablesmap`. This is a very post-like type. The main difference is the addition of a layer builder admin below the main body of the post.
+
+For now, your theme will need to patch its loop to include Fusion Tables maps in the main stream of posts (the StateWatch theme does this). This plugin should eventually handle that on its own.
+
+All admin javascript is in `js/ft-builder.js`, with a few TinyMCE helpers in `js/tinymce/editor-plugin.js`. All dependencies are included in the codebase.
+
+Notes on working with Backbone
+---------------------
+
+Each model and collection needs to define a `sync` method. **Do not override `Backbone.sync`**, as this will break other plugins. Since all WordPress ajax calls POST to the same URL (yes, this is absurd), this plugin defines an ajax hook and uses `sync` to pass in the right parameters.
